@@ -2,10 +2,18 @@
 <html lang="zh-Hant-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="防災資訊網：緊急聯絡電話、防災包清單、地震應變步驟，平時準備，災時不慌。">
   <meta name="theme-color" content="#c0392b">
   <title>防災資訊網</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="防災資訊">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -39,6 +47,13 @@
         <h1>防災，從現在開始</h1>
         <p class="lead">
           台灣位於地震帶，也常受颱風、豪雨影響。事先了解緊急聯絡方式、準備防災包、熟悉應變步驟，能在關鍵時刻保護自己與家人。</p>
+        <div class="install-box" id="install-box" hidden>
+          <div>
+            <strong>安裝成 APP</strong>
+            <small id="install-hint">加到主畫面，沒有網路也能開啟。</small>
+          </div>
+          <button type="button" class="btn btn-primary" id="install-btn" hidden>安裝</button>
+        </div>
         <div class="quick-links">
           <a class="quick-card" href="#contacts">
             <span class="quick-icon" aria-hidden="true">📞</span>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#c0392b"/>
+  <!-- 房屋 -->
+  <path d="M256 128 L384 236 L352 236 L352 360 L160 360 L160 236 L128 236 Z" fill="#fff"/>
+  <!-- 門 -->
+  <rect x="226" y="282" width="60" height="78" rx="6" fill="#c0392b"/>
+  <!-- 地震波 -->
+  <path d="M136 396 L176 396 L196 372 L220 412 L244 380 L268 412 L292 372 L316 412 L336 396 L376 396"
+        fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

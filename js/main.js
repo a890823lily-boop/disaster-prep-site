@@ -242,6 +242,59 @@
     });
   }
 
+  /* ===== PWA：離線快取與安裝 APP ===== */
+  function initPwa() {
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').catch(function () {
+          /* 註冊失敗時網站仍可正常使用 */
+        });
+      });
+    }
+
+    var box = document.getElementById('install-box');
+    var btn = document.getElementById('install-btn');
+    var hint = document.getElementById('install-hint');
+    if (!box) return;
+
+    var standalone = window.matchMedia('(display-mode: standalone)').matches ||
+      navigator.standalone === true;
+    if (standalone) return;
+
+    /* Android / 電腦版 Chrome、Edge：使用瀏覽器提供的安裝視窗 */
+    var deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault();
+      deferredPrompt = e;
+      box.hidden = false;
+      btn.hidden = false;
+    });
+
+    btn.addEventListener('click', function () {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function () {
+        deferredPrompt = null;
+        box.hidden = true;
+      });
+    });
+
+    window.addEventListener('appinstalled', function () {
+      box.hidden = true;
+    });
+
+    /* iPhone / iPad 不支援安裝視窗，改顯示操作說明 */
+    var ua = navigator.userAgent;
+    var isIos = /iPad|iPhone|iPod/.test(ua) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (isIos) {
+      hint.textContent = '點選瀏覽器下方的「分享」按鈕，再選「加入主畫面」。';
+      box.hidden = false;
+    }
+  }
+
+  initPwa();
+
   document.addEventListener('DOMContentLoaded', function () {
     initNav();
     initKit();
