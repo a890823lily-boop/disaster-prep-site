@@ -1,5 +1,9 @@
 # 防災資訊網 disaster-prep-site
 
+### 👉 [開啟網站：a890823lily-boop.github.io/disaster-prep-site](https://a890823lily-boop.github.io/disaster-prep-site/)
+
+用 iPhone Safari 開啟後，點「分享」→「加入主畫面」即可安裝成 APP。
+
 簡潔、適合手機瀏覽的防災資訊網站，使用純 HTML、CSS、JavaScript 製作，不需安裝任何套件。
 
 ## 內容
