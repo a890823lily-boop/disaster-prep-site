@@ -34,6 +34,7 @@
           <li><a href="#contacts">緊急電話</a></li>
           <li><a href="#kit">防災包</a></li>
           <li><a href="#earthquake">地震應變</a></li>
+          <li><a href="#quiz">情境挑戰</a></li>
         </ul>
       </nav>
     </div>
@@ -69,6 +70,11 @@
             <span class="quick-icon" aria-hidden="true">🏠</span>
             <span class="quick-title">地震應變</span>
             <span class="quick-desc">趴下・掩護・穩住</span>
+          </a>
+          <a class="quick-card" href="#quiz">
+            <span class="quick-icon" aria-hidden="true">🎬</span>
+            <span class="quick-title">情境挑戰</span>
+            <span class="quick-desc">動畫情境測驗</span>
           </a>
         </div>
       </div>
@@ -247,6 +253,60 @@
         </div>
       </div>
     </section>
+
+    <!-- 情境挑戰 -->
+    <section id="quiz" class="section section-alt">
+      <div class="container">
+        <h2 class="section-title"><span aria-hidden="true">🎬</span> 情境挑戰</h2>
+        <p class="section-desc">觀看災害情境動畫，在時間內選出正確的做法，看看你能不能安全過關！</p>
+
+        <div class="quiz">
+          <div class="quiz-start">
+            <div class="quiz-start-icon" aria-hidden="true">🎬</div>
+            <h3>防災情境挑戰</h3>
+            <p>共 6 個情境：客廳、廚房、電梯、街道、瓦斯外洩、開車。<br>每題有 15 秒作答時間。</p>
+            <button type="button" class="btn btn-primary btn-lg" id="quiz-start">▶ 開始挑戰</button>
+            <p class="quiz-best" id="quiz-best"></p>
+          </div>
+
+          <div class="quiz-play" hidden>
+            <div class="quiz-top">
+              <span>第 <strong id="quiz-progress">1 / 6</strong> 題</span>
+              <span>答對 <strong id="quiz-score">0</strong> 題</span>
+            </div>
+
+            <div class="stage">
+              <svg viewBox="0 0 320 200" role="img" aria-label="情境動畫"></svg>
+              <div class="stage-caption" aria-live="polite"></div>
+              <div class="stage-badge" aria-hidden="true"></div>
+            </div>
+            <div class="timer" hidden><div class="timer-fill"></div></div>
+
+            <h3 class="quiz-q" aria-live="polite" hidden></h3>
+            <div class="choices"></div>
+
+            <div class="feedback" hidden aria-live="polite">
+              <p class="feedback-title"></p>
+              <p class="feedback-text"></p>
+              <div class="feedback-actions">
+                <button type="button" class="btn btn-primary" id="quiz-next">下一題 →</button>
+              </div>
+            </div>
+            <div class="quiz-tools">
+              <button type="button" class="link-btn" id="quiz-replay">↻ 重播這個情境</button>
+            </div>
+          </div>
+
+          <div class="quiz-end" hidden>
+            <p class="quiz-end-label">你的成績</p>
+            <p class="quiz-final" id="quiz-final"></p>
+            <p id="quiz-final-msg"></p>
+            <ul class="quiz-review"></ul>
+            <button type="button" class="btn btn-primary btn-lg" id="quiz-again">再挑戰一次</button>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
@@ -257,5 +317,6 @@
   </footer>
 
   <script src="js/main.js"></script>
+  <script src="js/quiz.js"></script>
 </body>
 </html>

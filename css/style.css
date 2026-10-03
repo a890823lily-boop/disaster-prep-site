@@ -232,8 +232,14 @@ h1, h2, h3 {
 
 .quick-links {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
+}
+
+@media (min-width: 600px) {
+  .quick-links {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .quick-card {
@@ -687,5 +693,562 @@ h1, h2, h3 {
   }
   .site-footer {
     padding-bottom: calc(32px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ===== 情境挑戰 ===== */
+.quiz {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.quiz-start,
+.quiz-end {
+  text-align: center;
+  padding: 16px 0;
+}
+
+.quiz-start-icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.quiz-start p {
+  color: var(--text-muted);
+}
+
+.quiz-best {
+  font-size: 0.9rem;
+  margin-top: 12px;
+}
+
+.btn-lg {
+  min-height: 52px;
+  padding: 12px 28px;
+  font-size: 1.1rem;
+}
+
+.link-btn {
+  background: none;
+  border: 0;
+  padding: 8px;
+  min-height: 44px;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link-btn[hidden] {
+  display: none;
+}
+
+.quiz-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.quiz-top strong {
+  color: var(--text);
+}
+
+.quiz-tools {
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* 情境畫面 */
+.stage {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #222;
+  aspect-ratio: 16 / 10;
+}
+
+.stage svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.stage svg * {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.stage-caption {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  color: #fff;
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+
+.stage-caption > * {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.stage-caption .rec {
+  background: rgba(0, 0, 0, 0.55);
+  padding: 1px 8px;
+  border-radius: 999px;
+  text-shadow: none;
+}
+
+.stage-caption strong {
+  flex-basis: 100%;
+  display: none;
+  margin-top: 4px;
+  font-size: 1rem;
+  width: max-content;
+  max-width: 100%;
+  background: rgba(192, 57, 43, 0.9);
+  padding: 2px 10px;
+  border-radius: 6px;
+  text-shadow: none;
+}
+
+.stage.playing .stage-caption strong {
+  display: block;
+  animation: alert-pulse 0.8s ease-in-out infinite alternate;
+}
+
+.stage-caption .rec i {
+  font-style: normal;
+  color: #ff4d3d;
+}
+
+.stage.playing .rec i {
+  animation: alert-pulse 0.5s steps(2) infinite alternate;
+}
+
+.stage-badge {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  transform: scale(0);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.stage-badge.show {
+  transform: scale(1);
+}
+
+.stage-badge.ok {
+  background: var(--success);
+}
+
+.stage-badge.bad {
+  background: #e53935;
+}
+
+/* 地震搖晃 */
+.stage.quake-strong .world {
+  animation: quake-strong 0.22s linear infinite;
+}
+
+.stage.quake-soft .world {
+  animation: quake-soft 0.3s linear infinite;
+}
+
+.stage.quake-strong .swing,
+.stage.quake-soft .swing {
+  transform-origin: 50% 0;
+  animation: swing 0.7s ease-in-out infinite alternate;
+}
+
+.stage.quake-strong .wobble-soft,
+.stage.quake-soft .wobble-soft {
+  animation: wobble 0.4s ease-in-out infinite;
+}
+
+.flicker {
+  animation: flicker 0.4s ease-in-out infinite alternate;
+}
+
+.flicker-fast {
+  animation: flicker 0.15s steps(2) infinite;
+}
+
+.gas-wave {
+  animation: gas-drift 3s ease-in-out infinite;
+}
+
+.stage.driving .road-lines {
+  animation: road 0.5s linear infinite;
+}
+
+.stage.driving.result .road-lines {
+  animation-duration: 1.4s;
+  animation-iteration-count: 2;
+}
+
+/* 人物動作 */
+.stage .actor {
+  transition: transform 0.9s ease-in-out;
+}
+
+.person .legs-bent,
+.person .arms-up {
+  display: none;
+}
+
+.person .upper {
+  transition: transform 0.3s ease-out;
+}
+
+.person.crouch .legs-straight,
+.person.crouch .arms-down {
+  display: none;
+}
+
+.person.crouch .legs-bent,
+.person.crouch .arms-up {
+  display: inline;
+}
+
+.person.crouch .upper {
+  transform: translateY(10px);
+}
+
+/* 結果特效 */
+.fx-hidden {
+  opacity: 0;
+}
+
+.stage.result .fx-drop {
+  animation: fx-drop 0.6s ease-in forwards;
+}
+
+.stage.result .fx-tip {
+  transform-origin: var(--origin, 0% 100%);
+  animation: fx-tip 0.8s ease-in forwards;
+}
+
+.stage.result .fx-slide {
+  animation: fx-slide 0.7s ease-out forwards;
+}
+
+.stage.result .fx-show {
+  animation: fx-show 0.4s ease-out forwards;
+}
+
+.stage.result .fx-fade {
+  animation: fx-fade 1.2s ease-out forwards;
+}
+
+.stage.result .fx-blink {
+  animation: fx-blink 0.4s steps(1) infinite;
+}
+
+.stage.result .fx-lit {
+  animation: fx-lit 0.2s ease-out forwards;
+}
+
+.stage.result .world.fx-wobble {
+  animation: quake-strong 0.12s linear 6;
+}
+
+.flash {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.flash.on {
+  animation: flash 0.7s ease-out 2;
+}
+
+@keyframes quake-strong {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-5px, 2px); }
+  50% { transform: translate(4px, -2px); }
+  75% { transform: translate(-3px, -1px); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes quake-soft {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(2px, -1px); }
+}
+
+@keyframes swing {
+  from { transform: rotate(-14deg); }
+  to { transform: rotate(14deg); }
+}
+
+@keyframes wobble {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-4deg); }
+  75% { transform: rotate(4deg); }
+}
+
+@keyframes flicker {
+  from { opacity: 1; }
+  to { opacity: 0.55; }
+}
+
+@keyframes gas-drift {
+  0%, 100% { transform: translate(0, 0); opacity: 0.4; }
+  50% { transform: translate(10px, -8px); opacity: 0.85; }
+}
+
+@keyframes road {
+  from { transform: translateX(0); }
+  to { transform: translateX(-40px); }
+}
+
+@keyframes alert-pulse {
+  from { opacity: 1; }
+  to { opacity: 0.6; }
+}
+
+@keyframes fx-drop {
+  to { transform: translateY(var(--drop, 80px)) rotate(var(--rot, 25deg)); }
+}
+
+@keyframes fx-tip {
+  to { transform: rotate(var(--rot, -20deg)); }
+}
+
+@keyframes fx-slide {
+  to { transform: translateX(var(--dx, 60px)); }
+}
+
+@keyframes fx-show {
+  to { opacity: 1; }
+}
+
+@keyframes fx-fade {
+  to { opacity: 0; }
+}
+
+@keyframes fx-blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes fx-lit {
+  to { fill: #ffd54a; stroke: #e0a800; }
+}
+
+@keyframes flash {
+  0% { opacity: 0; }
+  30% { opacity: 0.55; }
+  100% { opacity: 0; }
+}
+
+/* 計時條 */
+.timer {
+  height: 8px;
+  margin-top: 10px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.timer[hidden] {
+  display: none;
+}
+
+.timer-fill {
+  height: 100%;
+  width: 100%;
+  background: var(--success);
+  border-radius: 999px;
+}
+
+.timer-fill.low {
+  background: #e53935;
+}
+
+/* 題目與選項 */
+.quiz-q {
+  font-size: 1.1rem;
+  margin: 16px 0 12px;
+}
+
+.choices {
+  display: grid;
+  gap: 10px;
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 10px 14px;
+  text-align: left;
+  background: var(--bg);
+  color: var(--text);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.choice:hover:not(:disabled) {
+  border-color: var(--primary);
+}
+
+.choice:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.choice-key {
+  flex: 0 0 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.choice.is-correct {
+  opacity: 1;
+  border-color: var(--success);
+  background: rgba(39, 174, 96, 0.12);
+}
+
+.choice.is-correct .choice-key {
+  background: var(--success);
+  border-color: var(--success);
+  color: #fff;
+}
+
+.choice.is-wrong {
+  opacity: 1;
+  border-color: #e53935;
+  background: rgba(229, 57, 53, 0.1);
+}
+
+.choice.is-wrong .choice-key {
+  background: #e53935;
+  border-color: #e53935;
+  color: #fff;
+}
+
+/* 解說 */
+.feedback {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border-left: 5px solid var(--success);
+  background: rgba(39, 174, 96, 0.1);
+  animation: fx-show 0.3s ease-out;
+}
+
+.feedback.bad {
+  border-left-color: #e53935;
+  background: rgba(229, 57, 53, 0.08);
+}
+
+.feedback-title {
+  margin: 0 0 4px;
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.feedback.ok .feedback-title {
+  color: var(--success);
+}
+
+.feedback.bad .feedback-title {
+  color: #e53935;
+}
+
+.feedback-text {
+  margin: 0 0 12px;
+}
+
+.feedback-actions {
+  text-align: right;
+}
+
+/* 結果 */
+.quiz-end-label {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.quiz-final {
+  margin: 0;
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.quiz-review {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 20px;
+  text-align: left;
+  display: grid;
+  gap: 8px;
+}
+
+.quiz-review li {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border-left: 4px solid var(--success);
+  background: var(--bg-alt);
+}
+
+.quiz-review li.bad {
+  border-left-color: #e53935;
+}
+
+.quiz-review strong,
+.quiz-review span {
+  display: block;
+}
+
+.quiz-review span {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage.quake-strong .world,
+  .stage.quake-soft .world,
+  .stage.result .world.fx-wobble,
+  .stage .swing,
+  .wobble-soft,
+  .flicker,
+  .flicker-fast,
+  .gas-wave,
+  .stage-caption strong {
+    animation: none !important;
   }
 }
