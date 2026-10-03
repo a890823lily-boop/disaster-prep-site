@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="防災資訊網：緊急聯絡電話、防災包清單、地震應變步驟，平時準備，災時不慌。">
+  <meta name="theme-color" content="#c0392b">
+  <title>防災資訊網</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="防災資訊">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要內容</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#home" class="logo" aria-label="防災資訊網 首頁">
+        <span class="logo-mark" aria-hidden="true">⛑</span>
+        <span>防災資訊網</span>
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="開啟選單">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="site-nav" class="site-nav" aria-label="主選單">
+        <ul>
+          <li><a href="#home">首頁</a></li>
+          <li><a href="#contacts">緊急電話</a></li>
+          <li><a href="#kit">防災包</a></li>
+          <li><a href="#earthquake">地震應變</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- 首頁簡介 -->
+    <section id="home" class="hero">
+      <div class="container">
+        <p class="eyebrow">平時準備・災時不慌</p>
+        <h1>防災，從現在開始</h1>
+        <p class="lead">
+          台灣位於地震帶，也常受颱風、豪雨影響。事先了解緊急聯絡方式、準備防災包、熟悉應變步驟，能在關鍵時刻保護自己與家人。</p>
+        <div class="install-box" id="install-box" hidden>
+          <div>
+            <strong>安裝成 APP</strong>
+            <small id="install-hint">加到主畫面，沒有網路也能開啟。</small>
+          </div>
+          <button type="button" class="btn btn-primary" id="install-btn" hidden>安裝</button>
+        </div>
+        <div class="quick-links">
+          <a class="quick-card" href="#contacts">
+            <span class="quick-icon" aria-hidden="true">📞</span>
+            <span class="quick-title">緊急電話</span>
+            <span class="quick-desc">一鍵撥號</span>
+          </a>
+          <a class="quick-card" href="#kit">
+            <span class="quick-icon" aria-hidden="true">🎒</span>
+            <span class="quick-title">防災包清單</span>
+            <span class="quick-desc">勾選檢查</span>
+          </a>
+          <a class="quick-card" href="#earthquake">
+            <span class="quick-icon" aria-hidden="true">🏠</span>
+            <span class="quick-title">地震應變</span>
+            <span class="quick-desc">趴下・掩護・穩住</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 緊急聯絡電話 -->
+    <section id="contacts" class="section">
+      <div class="container">
+        <h2 class="section-title"><span aria-hidden="true">📞</span> 緊急聯絡電話</h2>
+        <p class="section-desc">在手機上點選電話即可直接撥打。</p>
+
+        <ul class="contact-grid">
+          <li>
+            <a class="contact-card urgent" href="tel:119">
+              <span class="contact-num">119</span>
+              <span class="contact-info">
+                <strong>消防・救護</strong>
+                <small>火災、救護車、緊急救援</small>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class="contact-card urgent" href="tel:110">
+              <span class="contact-num">110</span>
+              <span class="contact-info">
+                <strong>警察局</strong>
+                <small>治安、交通事故報案</small>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class="contact-card urgent" href="tel:112">
+              <span class="contact-num">112</span>
+              <span class="contact-info">
+                <strong>行動電話緊急號碼</strong>
+                <small>無訊號、未插 SIM 卡也可撥打</small>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class="contact-card" href="tel:1991">
+              <span class="contact-num">1991</span>
+              <span class="contact-info">
+                <strong>報平安留言平台</strong>
+                <small>災時留言、查詢親友平安</small>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class="contact-card" href="tel:1999">
+              <span class="contact-num">1999</span>
+              <span class="contact-info">
+                <strong>縣市政府服務專線</strong>
+                <small>路樹倒塌、積水通報等</small>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class="contact-card" href="tel:1911">
+              <span class="contact-num">1911</span>
+              <span class="contact-info">
+                <strong>台電停電報修</strong>
+                <small>停電、電線掉落</small>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class="contact-card" href="tel:1910">
+              <span class="contact-num">1910</span>
+              <span class="contact-info">
+                <strong>自來水服務專線</strong>
+                <small>停水、漏水報修</small>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class="contact-card" href="tel:1925">
+              <span class="contact-num">1925</span>
+              <span class="contact-info">
+                <strong>安心專線</strong>
+                <small>災後心理支持，24 小時</small>
+              </span>
+            </a>
+          </li>
+        </ul>
+
+        <div class="tip">
+          <strong>小提醒：</strong>撥打時請保持冷靜，清楚說明「地點、發生什麼事、有無人員受傷」。家中長輩與小孩也應熟記 119 與 110。</div>
+      </div>
+    </section>
+
+    <!-- 防災包清單 -->
+    <section id="kit" class="section section-alt">
+      <div class="container">
+        <h2 class="section-title"><span aria-hidden="true">🎒</span> 防災包清單</h2>
+        <p class="section-desc">勾選已準備好的物品，紀錄會自動保存在這台裝置上。建議每半年檢查一次效期。</p>
+
+        <div class="progress-wrap" aria-live="polite">
+          <div class="progress-text">
+            已準備 <strong id="kit-count">0</strong> / <span id="kit-total">0</span> 項</div>
+          <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="防災包準備進度">
+            <div class="progress-fill" id="kit-progress"></div>
+          </div>
+        </div>
+
+        <div id="kit-list" class="kit-list">
+          <!-- 由 js/main.js 依資料產生 -->
+        </div>
+
+        <div class="kit-actions">
+          <button type="button" class="btn btn-outline" id="kit-reset">清除全部勾選</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 地震應變步驟 -->
+    <section id="earthquake" class="section">
+      <div class="container">
+        <h2 class="section-title"><span aria-hidden="true">🏠</span> 地震應變步驟</h2>
+        <p class="section-desc">地震發生時，記住三個動作：<strong>趴下、掩護、穩住</strong>。</p>
+
+        <div class="dch">
+          <div class="dch-item">
+            <span class="dch-icon" aria-hidden="true">⬇️</span>
+            <strong>趴下</strong>
+            <small>降低身體重心，避免跌倒</small>
+          </div>
+          <div class="dch-item">
+            <span class="dch-icon" aria-hidden="true">🛡️</span>
+            <strong>掩護</strong>
+            <small>躲在堅固桌下，保護頭頸部</small>
+          </div>
+          <div class="dch-item">
+            <span class="dch-icon" aria-hidden="true">✊</span>
+            <strong>穩住</strong>
+            <small>抓緊桌腳，直到搖晃停止</small>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="地震應變階段">
+          <button role="tab" id="tab-before" aria-controls="panel-before" aria-selected="false" tabindex="-1">平時準備</button>
+          <button role="tab" id="tab-during" aria-controls="panel-during" aria-selected="true">地震當下</button>
+          <button role="tab" id="tab-after" aria-controls="panel-after" aria-selected="false" tabindex="-1">地震過後</button>
+        </div>
+
+        <div class="tab-panel" role="tabpanel" id="panel-before" aria-labelledby="tab-before" hidden>
+          <ol class="steps">
+            <li><strong>固定家具</strong>：書櫃、衣櫃、冰箱等高大家具用 L 型鐵片固定在牆上。</li>
+            <li><strong>找出安全角落</strong>：確認家中堅固的桌子位置，遠離窗戶、玻璃與吊燈。</li>
+            <li><strong>規劃逃生路線</strong>：了解住家附近的避難處所，並與家人約定集合地點。</li>
+            <li><strong>準備防災包</strong>：放在出入口附近，方便隨時取用。</li>
+            <li><strong>認識開關位置</strong>：知道瓦斯總開關、電源總開關、水閥的位置與關閉方式。</li>
+          </ol>
+        </div>
+
+        <div class="tab-panel" role="tabpanel" id="panel-during" aria-labelledby="tab-during">
+          <ol class="steps">
+            <li><strong>趴下、掩護、穩住</strong>：就近躲到堅固桌下，一手護住頭頸，一手抓緊桌腳。</li>
+            <li><strong>沒有桌子時</strong>：靠近內牆蹲低，用手臂或包包保護頭頸部，遠離窗戶與高大家具。</li>
+            <li><strong>不要急著往外跑</strong>：搖晃中移動容易受傷，也可能被掉落物砸到。</li>
+            <li><strong>不要搭電梯</strong>：若正在電梯內，按下所有樓層按鈕，在最近樓層離開。</li>
+            <li><strong>在戶外時</strong>：遠離建築物、招牌、電線桿與圍牆，找空曠處蹲低保護頭部。</li>
+            <li><strong>開車時</strong>：打雙黃燈，慢慢靠邊停車，留在車內，避開橋樑與隧道。</li>
+          </ol>
+        </div>
+
+        <div class="tab-panel" role="tabpanel" id="panel-after" aria-labelledby="tab-after" hidden>
+          <ol class="steps">
+            <li><strong>檢查自己與家人</strong>：確認有無受傷，必要時進行簡單包紮。</li>
+            <li><strong>小心餘震</strong>：保持警覺，餘震來時同樣「趴下、掩護、穩住」。</li>
+            <li><strong>檢查瓦斯與電線</strong>：聞到瓦斯味勿開關電器或點火，打開門窗後關閉總開關並離開。</li>
+            <li><strong>穿鞋再移動</strong>：避免被碎玻璃割傷；走樓梯，不要搭電梯。</li>
+            <li><strong>收聽官方資訊</strong>：透過收音機、手機接收中央氣象署與政府發布的訊息，勿轉傳未證實消息。</li>
+            <li><strong>報平安</strong>：電話線路擁塞時，可撥 1991 留言或使用簡訊、社群報平安。</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>本站資訊僅供參考，實際應變請依政府單位最新公告為準。</p>
+      <p><a href="#home">回到頂端 ↑</a></p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
