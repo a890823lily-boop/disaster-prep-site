@@ -738,3 +738,273 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+/* ===== 本頁快速跳轉 ===== */
+.page-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.page-jump a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+}
+
+.page-jump a:hover {
+  border-color: var(--primary);
+}
+
+/* ===== 我們的校園岩石 ===== */
+.campus-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.campus-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 6px solid var(--c);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.campus-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.campus-head h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.campus-num {
+  color: var(--c);
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+.campus-main {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-alt);
+  cursor: zoom-in;
+}
+
+.campus-main img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.campus-zoom {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 0.78rem;
+}
+
+.campus-thumbs {
+  display: flex;
+  gap: 8px;
+}
+
+.campus-thumb {
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 3px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-alt);
+  cursor: pointer;
+}
+
+.campus-thumb[aria-pressed="true"] {
+  border-color: var(--c);
+}
+
+.campus-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.campus-facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  margin: 0;
+}
+
+.campus-facts dt {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.campus-facts dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.campus-label {
+  margin: 0 0 6px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.campus-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.campus-chips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 4px;
+  border-radius: 999px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.chip-k {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--c);
+  color: #fff;
+  font-size: 0.78rem;
+}
+
+.campus-other {
+  margin: 8px 0 0;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.campus-guess {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.campus-guess .campus-label {
+  margin: 0;
+}
+
+.guess-yes,
+.guess-unsure {
+  padding: 2px 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.guess-yes {
+  background: var(--c);
+  color: #fff;
+}
+
+.guess-unsure {
+  border: 2px dashed var(--c);
+  color: var(--c);
+}
+
+.campus-think {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--bg-alt);
+}
+
+.campus-think p:last-child {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.campus-note {
+  margin: 16px 0 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* 放大照片 */
+.photo-dialog {
+  max-width: min(960px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: #111;
+  color: #fff;
+  overflow: hidden;
+}
+
+.photo-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.photo-dialog img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100vh - 100px);
+  margin: 0 auto;
+}
+
+.photo-dialog-cap {
+  margin: 0;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+}
+
+.photo-dialog-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+}

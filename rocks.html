@@ -47,6 +47,11 @@
         <p class="eyebrow">校園岩石偵查・行前暖身</p>
         <h1>認識三大岩石家族</h1>
         <p class="lead">先看約 5 分鐘的動畫影片，認識火成岩、沉積岩、變質岩怎麼形成，再挑戰問答，就可以出發去校園偵查岩石了！</p>
+        <nav class="page-jump" aria-label="本頁內容">
+          <a href="#video">🎬 看影片</a>
+          <a href="#rock-quiz">🔍 小測驗</a>
+          <a href="#campus">📷 校園偵查成果</a>
+        </nav>
       </div>
     </section>
 
@@ -136,7 +141,23 @@
         </div>
       </div>
     </section>
+
+    <!-- 我們的校園岩石 -->
+    <section id="campus" class="section">
+      <div class="container">
+        <h2 class="section-title"><span aria-hidden="true">📷</span> 我們的校園岩石</h2>
+        <p class="section-desc">這是同學們在校園裡拍照、觀察的偵查記錄。偵探只寫看到、摸到的證據，岩石的名稱還在調查中！</p>
+        <div class="campus-list"></div>
+        <p class="campus-note">記錄整理自「校園岩石偵查站」，2026 年 10 月。</p>
+      </div>
+    </section>
   </main>
+
+  <dialog class="photo-dialog" aria-label="放大的照片">
+    <button type="button" class="photo-dialog-close" aria-label="關閉">✕</button>
+    <img src="" alt="">
+    <p class="photo-dialog-cap"></p>
+  </dialog>
 
   <footer class="site-footer">
     <div class="container">
@@ -147,5 +168,6 @@
 
   <script src="js/main.js"></script>
   <script src="js/rocks.js"></script>
+  <script src="js/campus-rocks.js"></script>
 </body>
 </html>

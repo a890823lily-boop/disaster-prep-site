@@ -1,5 +1,5 @@
 /* 防災資訊網 Service Worker：預先快取所有檔案，讓 APP 離線也能開啟 */
-var CACHE_NAME = 'disaster-prep-v3';
+var CACHE_NAME = 'disaster-prep-v4';
 var PRECACHE = [
   './',
   'index.html',
@@ -9,6 +9,7 @@ var PRECACHE = [
   'js/main.js',
   'js/quiz.js',
   'js/rocks.js',
+  'js/campus-rocks.js',
   'manifest.webmanifest',
   'icons/icon.svg',
   'icons/icon-192.png',
