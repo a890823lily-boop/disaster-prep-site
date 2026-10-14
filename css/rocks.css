@@ -1,0 +1,1010 @@
+/* ===== 認識岩石頁 ===== */
+.rocks-hero {
+  padding: 32px 0 8px;
+  background: linear-gradient(180deg, #fff1df 0%, var(--bg) 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .rocks-hero {
+    background: linear-gradient(180deg, #2b2116 0%, var(--bg) 100%);
+  }
+}
+
+.rocks-hero h1 {
+  font-size: clamp(1.7rem, 5.5vw, 2.4rem);
+}
+
+.rocks-hero .section,
+#video {
+  padding-top: 16px;
+}
+
+.btn-lg {
+  min-height: 52px;
+  padding: 12px 28px;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.btn-outline {
+  text-decoration: none;
+}
+
+/* ===== 影片播放器 ===== */
+.player {
+  max-width: 880px;
+  margin: 0 auto;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #111;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  outline-offset: 4px;
+}
+
+.player:fullscreen {
+  max-width: none;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.player-stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #fff;
+  cursor: pointer;
+}
+
+.player:fullscreen .player-stage {
+  width: min(100vw, calc((100vh - 140px) * 16 / 9));
+  margin: 0 auto;
+}
+
+.player-stage svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.player-stage svg text {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+}
+
+.player-stage svg * {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* 字幕列（在畫面下方，不遮住動畫） */
+.subtitle {
+  margin: 0;
+  min-height: 3.4em;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  color: #fff;
+  font-size: clamp(0.95rem, 2.4vw, 1.25rem);
+  line-height: 1.5;
+  text-align: center;
+}
+
+.player.no-subs .subtitle {
+  display: none;
+}
+
+.player:fullscreen .subtitle {
+  font-size: clamp(1.1rem, 2.4vw, 2rem);
+}
+
+/* 封面與結束畫面 */
+.player-cover,
+.player-end {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 16px;
+  text-align: center;
+  color: #fff;
+  background: radial-gradient(circle at 50% 40%, #24438f, #0b1022);
+  cursor: default;
+}
+
+.player-cover[hidden],
+.player-end[hidden] {
+  display: none;
+}
+
+.player-cover h2,
+.player-end h2 {
+  font-size: clamp(1.3rem, 5vw, 2.2rem);
+  margin: 0;
+}
+
+.cover-kicker {
+  margin: 0;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  opacity: 0.85;
+}
+
+.cover-meta {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.big-play {
+  width: clamp(56px, 14vw, 84px);
+  height: clamp(56px, 14vw, 84px);
+  border-radius: 50%;
+  border: 0;
+  background: #fff;
+  color: #1e3a8a;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  padding-left: 6px;
+  cursor: pointer;
+  box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.2);
+  transition: transform 0.15s;
+}
+
+.big-play:hover {
+  transform: scale(1.06);
+}
+
+.end-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* 控制列 */
+.player-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #1b1d22;
+  color: #fff;
+}
+
+.vp-btn {
+  flex: 0 0 auto;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.vp-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.vp-btn[hidden] {
+  display: none;
+}
+
+.vp-toggle {
+  font-size: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.vp-toggle[aria-pressed="false"] {
+  opacity: 0.6;
+}
+
+.vp-progress {
+  position: relative;
+  flex: 1;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.vp-track {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+}
+
+.vp-fill {
+  height: 100%;
+  width: 0;
+  background: #ff6b5b;
+}
+
+.vp-marks span {
+  position: absolute;
+  top: 50%;
+  width: 3px;
+  height: 12px;
+  margin-top: -6px;
+  background: #fff;
+  border-radius: 2px;
+  opacity: 0.8;
+}
+
+.vp-time {
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
+@media (max-width: 480px) {
+  .player-controls {
+    flex-wrap: wrap;
+    gap: 4px 6px;
+  }
+  .vp-progress {
+    order: -1;
+    flex-basis: 100%;
+    height: 28px;
+  }
+  .vp-time {
+    margin-right: auto;
+  }
+}
+
+/* 章節 */
+.chapters-title {
+  font-size: 1.1rem;
+  margin: 24px 0 10px;
+}
+
+.chapter-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.chapter-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 2px solid var(--border);
+  border-left: 6px solid var(--c, var(--text-muted));
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.chapter-btn.current {
+  border-color: var(--c, var(--primary));
+  background: var(--bg-alt);
+}
+
+.chapter-time {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.teacher-tip {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--bg-alt);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* ===== 場景動畫 ===== */
+.player-stage [data-s] {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.player-stage [data-s].on {
+  opacity: 1;
+}
+
+.player-stage .gone {
+  opacity: 0 !important;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.player-stage [data-s].on .bounce {
+  animation: bounce-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.player-stage [data-s].pop.on,
+.player-stage [data-s].on .pop:not([data-s]) {
+  animation: bounce-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.player-stage .slide-in.on {
+  animation: slide-in 0.5s ease-out both;
+}
+
+.player-stage .float {
+  animation: float 2s ease-in-out infinite alternate;
+}
+
+.player-stage .glow {
+  animation: glow 1.4s ease-in-out infinite alternate;
+}
+
+.player-stage .twinkle {
+  animation: twinkle 1.6s ease-in-out infinite;
+}
+
+/* 火成岩 */
+.player-stage .magma-glow {
+  animation: glow 1s ease-in-out infinite alternate;
+}
+
+.player-stage .on .magma-rise {
+  transform-origin: 50% 100%;
+  animation: rise 2.2s ease-out both;
+}
+
+.player-stage .on .erupt {
+  animation: erupt 1.2s ease-out infinite;
+}
+
+.player-stage .on .lava {
+  animation: lava-cool 4s ease-in forwards;
+}
+
+/* 沉積岩 */
+.player-stage .rain {
+  animation: rain 0.6s linear infinite;
+}
+
+.player-stage .on .roll {
+  animation: roll 3s ease-in-out infinite;
+}
+
+.player-stage .settle {
+  transform: translateY(-40px);
+  transition: opacity 0.8s ease, transform 0.8s ease-in;
+}
+
+.player-stage .settle.on {
+  transform: none;
+}
+
+.player-stage .press {
+  animation: press 0.9s ease-in-out infinite alternate;
+}
+
+.player-stage .fall-rock {
+  animation: fall-rock 2.6s ease-in infinite;
+}
+
+/* 變質岩 */
+.player-stage .heat {
+  animation: glow 0.9s ease-in-out infinite alternate;
+}
+
+.player-stage .squeeze-l {
+  animation: squeeze-l 1s ease-in-out infinite alternate;
+}
+
+.player-stage .squeeze-r {
+  animation: squeeze-r 1s ease-in-out infinite alternate;
+}
+
+.player-stage .on .clay ellipse {
+  animation: flatten 1.6s ease-in-out 0.3s forwards;
+}
+
+/* 岩石循環 */
+.player-stage .draw.on path:first-child {
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  animation: draw 1s ease-out forwards;
+}
+
+.player-stage .node {
+  animation: bounce-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* 暫停時凍結動畫 */
+.player:not(.is-playing) .player-stage svg * {
+  animation-play-state: paused !important;
+}
+
+@keyframes bounce-in {
+  from { transform: scale(0.6); }
+  to { transform: scale(1); }
+}
+
+@keyframes slide-in {
+  from { transform: translateX(-24px); }
+  to { transform: none; }
+}
+
+@keyframes float {
+  from { transform: translateY(0); }
+  to { transform: translateY(-6px); }
+}
+
+@keyframes glow {
+  from { opacity: 1; }
+  to { opacity: 0.65; }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.4); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes rise {
+  from { transform: scaleY(0.1); }
+  to { transform: scaleY(1); }
+}
+
+@keyframes erupt {
+  from { transform: translateY(10px); opacity: 1; }
+  to { transform: translateY(-14px) scale(1.4); opacity: 0; }
+}
+
+@keyframes lava-cool {
+  0% { fill: #ff6a00; }
+  60% { fill: #c2410c; }
+  100% { fill: #3c3e43; }
+}
+
+@keyframes rain {
+  from { transform: translateY(-6px); }
+  to { transform: translateY(6px); }
+}
+
+@keyframes roll {
+  0% { transform: translate(0, 0); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translate(140px, 30px); opacity: 0; }
+}
+
+@keyframes press {
+  from { transform: translateY(-4px); }
+  to { transform: translateY(4px); }
+}
+
+@keyframes fall-rock {
+  0% { transform: translate(0, 0) rotate(0); }
+  70% { transform: translate(30px, 36px) rotate(200deg); }
+  100% { transform: translate(40px, 36px) rotate(240deg); opacity: 0; }
+}
+
+@keyframes squeeze-l {
+  from { transform: translateX(0); }
+  to { transform: translateX(12px); }
+}
+
+@keyframes squeeze-r {
+  from { transform: translateX(0); }
+  to { transform: translateX(-12px); }
+}
+
+@keyframes flatten {
+  to { transform: scale(1.7, 0.45); }
+}
+
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ===== 問答 ===== */
+.rq {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.rq-start,
+.rq-end {
+  text-align: center;
+  padding: 12px 0;
+}
+
+.rq-start-icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.rq-start p {
+  color: var(--text-muted);
+}
+
+.rq-top {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.rq-bar {
+  height: 8px;
+  margin: 8px 0 4px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.rq-bar span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--primary);
+  transition: width 0.3s;
+}
+
+.rq-q {
+  font-size: 1.15rem;
+  margin: 14px 0 12px;
+}
+
+.rq-img {
+  margin: 0 auto 14px;
+  max-width: 320px;
+  padding: 8px;
+  border-radius: 12px;
+  background: var(--bg-alt);
+}
+
+.rq-img[hidden] {
+  display: none;
+}
+
+.rq-img svg {
+  display: block;
+  width: 100%;
+}
+
+.rq-options {
+  display: grid;
+  gap: 10px;
+}
+
+.rq-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 14px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 1.05rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rq-option:hover:not(:disabled) {
+  border-color: var(--primary);
+}
+
+.rq-option:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.rq-key {
+  flex: 0 0 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.rq-option.is-correct {
+  opacity: 1;
+  border-color: var(--success);
+  background: rgba(39, 174, 96, 0.12);
+}
+
+.rq-option.is-correct .rq-key {
+  background: var(--success);
+  border-color: var(--success);
+  color: #fff;
+}
+
+.rq-option.is-wrong {
+  opacity: 1;
+  border-color: #e53935;
+  background: rgba(229, 57, 53, 0.1);
+}
+
+.rq-option.is-wrong .rq-key {
+  background: #e53935;
+  border-color: #e53935;
+  color: #fff;
+}
+
+.rq-feedback {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border-left: 5px solid var(--success);
+  background: rgba(39, 174, 96, 0.1);
+}
+
+.rq-feedback.bad {
+  border-left-color: #e53935;
+  background: rgba(229, 57, 53, 0.08);
+}
+
+.rq-feedback[hidden] {
+  display: none;
+}
+
+.rq-fb-title {
+  margin: 0 0 4px;
+  font-weight: 800;
+}
+
+.rq-fb-text {
+  margin: 0 0 12px;
+}
+
+.rq-fb-actions {
+  text-align: right;
+}
+
+.rq-stars {
+  margin: 0;
+  font-size: 2.6rem;
+  letter-spacing: 0.1em;
+  color: #f5b301;
+}
+
+.rq-score {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.rq-review {
+  list-style: none;
+  margin: 16px 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  text-align: left;
+}
+
+.rq-review li {
+  padding: 10px 14px;
+  border-left: 4px solid #e53935;
+  border-radius: 10px;
+  background: var(--bg-alt);
+}
+
+.rq-review strong,
+.rq-review span {
+  display: block;
+}
+
+.rq-review span {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.rq-end-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player-stage svg * {
+    animation-duration: 0.01s !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ===== 本頁快速跳轉 ===== */
+.page-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.page-jump a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+}
+
+.page-jump a:hover {
+  border-color: var(--primary);
+}
+
+/* ===== 我們的校園岩石 ===== */
+.campus-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.campus-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 6px solid var(--c);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.campus-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.campus-head h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.campus-num {
+  color: var(--c);
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+.campus-main {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-alt);
+  cursor: zoom-in;
+}
+
+.campus-main img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.campus-zoom {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 0.78rem;
+}
+
+.campus-thumbs {
+  display: flex;
+  gap: 8px;
+}
+
+.campus-thumb {
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 3px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-alt);
+  cursor: pointer;
+}
+
+.campus-thumb[aria-pressed="true"] {
+  border-color: var(--c);
+}
+
+.campus-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.campus-facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  margin: 0;
+}
+
+.campus-facts dt {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.campus-facts dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.campus-label {
+  margin: 0 0 6px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.campus-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.campus-chips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 4px;
+  border-radius: 999px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.chip-k {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--c);
+  color: #fff;
+  font-size: 0.78rem;
+}
+
+.campus-other {
+  margin: 8px 0 0;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.campus-guess {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.campus-guess .campus-label {
+  margin: 0;
+}
+
+.guess-yes,
+.guess-unsure {
+  padding: 2px 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.guess-yes {
+  background: var(--c);
+  color: #fff;
+}
+
+.guess-unsure {
+  border: 2px dashed var(--c);
+  color: var(--c);
+}
+
+.campus-think {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--bg-alt);
+}
+
+.campus-think p:last-child {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.campus-note {
+  margin: 16px 0 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* 放大照片 */
+.photo-dialog {
+  max-width: min(960px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: #111;
+  color: #fff;
+  overflow: hidden;
+}
+
+.photo-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.photo-dialog img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100vh - 100px);
+  margin: 0 auto;
+}
+
+.photo-dialog-cap {
+  margin: 0;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+}
+
+.photo-dialog-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+}

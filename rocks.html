@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="認識火成岩、沉積岩、變質岩：約 5 分鐘的動畫教學影片與互動問答，校園岩石偵查前的暖身。">
+  <meta name="theme-color" content="#c0392b">
+  <title>認識岩石｜防災資訊網</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="防災資訊">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/rocks.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要內容</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo" aria-label="防災資訊網 首頁">
+        <span class="logo-mark" aria-hidden="true">⛑</span>
+        <span>防災資訊網</span>
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="開啟選單">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="site-nav" class="site-nav" aria-label="主選單">
+        <ul>
+          <li><a href="index.html">首頁</a></li>
+          <li><a href="index.html#contacts">緊急電話</a></li>
+          <li><a href="index.html#kit">防災包</a></li>
+          <li><a href="index.html#earthquake">地震應變</a></li>
+          <li><a href="index.html#quiz">情境挑戰</a></li>
+          <li><a href="rocks.html" class="active" aria-current="page">認識岩石</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="rocks-hero">
+      <div class="container">
+        <p class="eyebrow">校園岩石偵查・行前暖身</p>
+        <h1>認識三大岩石家族</h1>
+        <p class="lead">先看約 5 分鐘的動畫影片，認識火成岩、沉積岩、變質岩怎麼形成，再挑戰問答，就可以出發去校園偵查岩石了！</p>
+        <nav class="page-jump" aria-label="本頁內容">
+          <a href="#video">🎬 看影片</a>
+          <a href="#rock-quiz">🔍 小測驗</a>
+          <a href="#campus">📷 校園偵查成果</a>
+        </nav>
+      </div>
+    </section>
+
+    <!-- 影片 -->
+    <section id="video" class="section">
+      <div class="container">
+        <div class="player" tabindex="0" aria-label="認識岩石動畫影片">
+          <div class="player-stage">
+            <svg viewBox="0 0 320 180" role="img" aria-label="影片畫面"></svg>
+
+            <div class="player-cover">
+              <p class="cover-kicker">岩石偵探訓練影片</p>
+              <h2>認識三大岩石家族</h2>
+              <p class="cover-meta"><span id="vp-total">約 5 分鐘</span>・火成岩・沉積岩・變質岩</p>
+              <button type="button" class="big-play" id="vp-start" aria-label="播放影片">▶</button>
+            </div>
+
+            <div class="player-end" hidden>
+              <h2>影片結束！</h2>
+              <p>準備好接受挑戰了嗎？</p>
+              <div class="end-actions">
+                <a class="btn btn-primary btn-lg" href="#rock-quiz" id="vp-to-quiz">開始問答 →</a>
+                <button type="button" class="btn btn-ghost" id="vp-replay">↻ 重看一次</button>
+              </div>
+            </div>
+          </div>
+
+          <p class="subtitle" aria-live="polite"></p>
+          <div class="player-controls">
+            <button type="button" class="vp-btn" id="vp-play" aria-label="播放">▶</button>
+            <div class="vp-progress" role="slider" tabindex="0" aria-label="影片進度" aria-valuemin="0" aria-valuenow="0">
+              <div class="vp-track"><div class="vp-fill"></div></div>
+              <div class="vp-marks"></div>
+            </div>
+            <span class="vp-time" id="vp-time">0:00</span>
+            <button type="button" class="vp-btn vp-toggle" id="vp-voice" aria-pressed="false" hidden>🔇 旁白</button>
+            <button type="button" class="vp-btn vp-toggle" id="vp-subs" aria-pressed="true">字幕</button>
+            <button type="button" class="vp-btn" id="vp-full" aria-label="全螢幕">⛶</button>
+          </div>
+        </div>
+
+        <h2 class="chapters-title">章節</h2>
+        <div class="chapter-list"></div>
+        <p class="teacher-tip">👩‍🏫 上課投影時，可按「⛶」全螢幕播放。旁白使用裝置內建的中文語音；沒有語音的裝置會自動以字幕播放。</p>
+      </div>
+    </section>
+
+    <!-- 互動問答 -->
+    <section id="rock-quiz" class="section section-alt">
+      <div class="container">
+        <h2 class="section-title"><span aria-hidden="true">🔍</span> 岩石偵探小測驗</h2>
+        <p class="section-desc">看完影片，來檢查看看你記住了多少！</p>
+
+        <div class="rq">
+          <div class="rq-start">
+            <div class="rq-start-icon" aria-hidden="true">🪨</div>
+            <h3>共 9 題</h3>
+            <p>答對越多，星星越多。全部答對就是合格的岩石偵探！</p>
+            <button type="button" class="btn btn-primary btn-lg" id="rq-start">開始挑戰</button>
+          </div>
+
+          <div class="rq-play" hidden>
+            <div class="rq-top">
+              <span id="rq-progress">第 1 / 9 題</span>
+            </div>
+            <div class="rq-bar"><span></span></div>
+            <h3 class="rq-q" aria-live="polite"></h3>
+            <div class="rq-img" hidden></div>
+            <div class="rq-options"></div>
+            <div class="rq-feedback" hidden aria-live="polite">
+              <p class="rq-fb-title"></p>
+              <p class="rq-fb-text"></p>
+              <div class="rq-fb-actions"><button type="button" class="btn btn-primary" id="rq-next">下一題 →</button></div>
+            </div>
+          </div>
+
+          <div class="rq-end" hidden>
+            <p class="rq-stars" aria-hidden="true"></p>
+            <p class="rq-score" id="rq-score"></p>
+            <p id="rq-msg"></p>
+            <ul class="rq-review" hidden></ul>
+            <div class="rq-end-actions">
+              <button type="button" class="btn btn-primary btn-lg" id="rq-again">再挑戰一次</button>
+              <a class="btn btn-outline" href="#video">回去看影片</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 我們的校園岩石 -->
+    <section id="campus" class="section">
+      <div class="container">
+        <h2 class="section-title"><span aria-hidden="true">📷</span> 我們的校園岩石</h2>
+        <p class="section-desc">這是同學們在校園裡拍照、觀察的偵查記錄。偵探只寫看到、摸到的證據，岩石的名稱還在調查中！</p>
+        <div class="campus-list"></div>
+        <p class="campus-note">記錄整理自「校園岩石偵查站」，2026 年 10 月。</p>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="photo-dialog" aria-label="放大的照片">
+    <button type="button" class="photo-dialog-close" aria-label="關閉">✕</button>
+    <img src="" alt="">
+    <p class="photo-dialog-cap"></p>
+  </dialog>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>本站資訊僅供參考，實際應變請依政府單位最新公告為準。</p>
+      <p><a href="#main">回到頂端 ↑</a></p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/rocks.js"></script>
+  <script src="js/campus-rocks.js"></script>
+</body>
+</html>
