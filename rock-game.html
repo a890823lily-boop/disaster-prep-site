@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="岩石偵探：在台灣四個場景中走動調查，用放大鏡、側光、稀鹽酸、泡水蒐集證據，推理出火成岩、沉積岩、變質岩。">
+  <meta name="theme-color" content="#c0392b">
+  <title>岩石偵探遊戲｜防災資訊網</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="防災資訊">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/rock-game.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要內容</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo" aria-label="防災資訊網 首頁">
+        <span class="logo-mark" aria-hidden="true">⛑</span>
+        <span>防災資訊網</span>
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="開啟選單">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="site-nav" class="site-nav" aria-label="主選單">
+        <ul>
+          <li><a href="index.html">首頁</a></li>
+          <li><a href="index.html#contacts">緊急電話</a></li>
+          <li><a href="index.html#kit">防災包</a></li>
+          <li><a href="index.html#earthquake">地震應變</a></li>
+          <li><a href="index.html#quiz">情境挑戰</a></li>
+          <li><a href="rocks.html">認識岩石</a></li>
+          <li><a href="rock-game.html" class="active" aria-current="page">岩石偵探</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="game-hero">
+      <div class="container">
+        <p class="eyebrow">火成岩・沉積岩・變質岩 複習挑戰</p>
+        <h1>岩石偵探：消失的標本標籤</h1>
+        <p class="lead">走進火山海岸、奇岩海岸、大理石峽谷和校園，找出可疑的岩石。挑選工具蒐集證據，用推理替每塊岩石找回名字。工具用得越少、推理越精準，星星越多！</p>
+      </div>
+    </section>
+
+    <section class="section game-section">
+      <div class="container">
+        <div class="game">
+          <div class="game-hud">
+            <span class="hud-scene" id="hud-scene">台灣地圖</span>
+            <span class="hud-stat" id="hud-solved">🪨 0/13</span>
+            <span class="hud-stat" id="hud-stars">⭐ 0</span>
+            <button type="button" class="hud-btn" id="hud-book" aria-label="案件簿">📒<span>案件簿</span></button>
+            <button type="button" class="hud-btn" id="hud-map" aria-label="地圖">🗺️<span>地圖</span></button>
+            <button type="button" class="hud-btn" id="hud-full" aria-label="全螢幕">⛶</button>
+          </div>
+
+          <div class="game-stage" tabindex="0">
+            <svg viewBox="0 0 320 180" role="img" aria-label="遊戲畫面"></svg>
+            <div class="game-dialog" hidden>
+              <p class="game-dialog-name"></p>
+              <p class="game-dialog-text" aria-live="polite"></p>
+              <button type="button" class="btn btn-primary" id="dialog-next">繼續 ▶</button>
+            </div>
+            <div class="game-toast" role="status" hidden></div>
+          </div>
+
+          <div class="game-controls">
+            <button type="button" class="ctl-btn" id="ctl-left" aria-label="往左走">◀</button>
+            <button type="button" class="ctl-action" id="ctl-action" disabled>靠近石頭</button>
+            <button type="button" class="ctl-btn" id="ctl-right" aria-label="往右走">▶</button>
+          </div>
+          <p class="game-help">電腦：← → 移動、空白鍵調查。手機：按住 ◀ ▶ 移動，或直接點畫面上的石頭。</p>
+
+          <!-- 開始畫面 -->
+          <div class="game-layer game-start" hidden>
+            <div class="layer-panel start-panel">
+              <p class="start-kicker">阿岩博士的委託</p>
+              <h2>岩石偵探：消失的標本標籤</h2>
+              <ul class="start-rules">
+                <li><strong>🚶 探索</strong>在 4 個場景裡走動，靠近可疑的石頭、搜查草叢和水池</li>
+                <li><strong>🧰 蒐證</strong>放大鏡、側光、稀鹽酸、泡水，自己決定用哪些工具</li>
+                <li><strong>🧠 推理</strong>判斷家族、名稱，並選出最有力的關鍵證據</li>
+                <li><strong>⭐ 星星</strong>一次推理成功 ⭐、2 種工具以內 ⭐、正確破案 ⭐</li>
+              </ul>
+              <button type="button" class="btn btn-primary btn-lg" id="game-start-btn">▶ 開始調查</button>
+            </div>
+          </div>
+
+          <!-- 地圖 -->
+          <div class="game-layer game-map" hidden>
+            <div class="layer-panel map-panel">
+              <div class="layer-head">
+                <h3>🗺️ 選擇調查地點</h3>
+                <p id="map-progress"></p>
+              </div>
+              <div class="map-wrap">
+                <svg viewBox="0 0 320 180" aria-hidden="true"></svg>
+                <div class="map-pins"></div>
+              </div>
+              <div class="layer-foot">
+                <button type="button" class="btn btn-outline" id="map-book">📒 打開案件簿</button>
+                <button type="button" class="link-btn" id="game-reset">重新開始</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 調查 -->
+          <div class="game-layer game-inv" hidden role="dialog" aria-modal="true" aria-label="調查岩石">
+            <div class="layer-panel inv-panel">
+              <div class="layer-head">
+                <div>
+                  <h3 class="inv-title"></h3>
+                  <p class="inv-sub"></p>
+                </div>
+                <button type="button" class="close-btn" data-close aria-label="關閉">✕</button>
+              </div>
+              <div class="inv-specimen"><svg viewBox="0 0 320 150" role="img" aria-label="岩石標本"></svg></div>
+
+              <h4 class="inv-h">① 選擇工具蒐集證據</h4>
+              <div class="inv-tools"></div>
+              <p class="inv-toolcount"></p>
+              <p class="inv-safety">🥽 真實實驗時，稀鹽酸要戴護目鏡、由老師操作喔！</p>
+
+              <h4 class="inv-h">證據卡</h4>
+              <ul class="inv-evidence"></ul>
+
+              <div class="inv-deduce">
+                <h4 class="inv-h">② 推理結案</h4>
+                <p class="deduce-label">它屬於哪個家族？</p>
+                <div class="deduce-family choice-row"></div>
+                <p class="deduce-label">它叫什麼名字？</p>
+                <div class="deduce-name choice-row"></div>
+                <p class="deduce-label">你的關鍵證據</p>
+                <p class="deduce-key missing"></p>
+                <p class="inv-feedback" role="alert" hidden></p>
+                <button type="button" class="btn btn-primary btn-lg" id="inv-submit" disabled>🔎 結案！</button>
+              </div>
+
+              <div class="inv-result" hidden>
+                <p class="res-stars"></p>
+                <p class="res-title"><span class="res-name"></span><span class="res-family"></span></p>
+                <p class="res-explain"></p>
+                <p class="res-notes"></p>
+                <button type="button" class="btn btn-primary" id="inv-close">收進案件簿 📒</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 博士的思考題 -->
+          <div class="game-layer game-think" hidden role="dialog" aria-modal="true" aria-label="博士的思考題">
+            <div class="layer-panel think-panel">
+              <div class="layer-head">
+                <h3>🧓 阿岩博士的思考題</h3>
+                <button type="button" class="close-btn" data-close aria-label="關閉">✕</button>
+              </div>
+              <p class="think-q"></p>
+              <div class="think-options"></div>
+              <p class="think-feedback" hidden></p>
+              <button type="button" class="btn btn-primary" id="think-close">回到現場</button>
+            </div>
+          </div>
+
+          <!-- 案件簿 -->
+          <div class="game-layer game-book" hidden role="dialog" aria-modal="true" aria-label="案件簿">
+            <div class="layer-panel book-panel">
+              <div class="layer-head">
+                <div>
+                  <h3>📒 案件簿</h3>
+                  <p id="book-summary"></p>
+                </div>
+                <button type="button" class="close-btn" data-close aria-label="關閉">✕</button>
+              </div>
+              <p class="book-tip">點已破案的標本，可以複習所有證據和說明。</p>
+              <div class="book-grid"></div>
+            </div>
+          </div>
+
+          <!-- 最終案件 -->
+          <div class="game-layer game-final" hidden role="dialog" aria-modal="true" aria-label="最終案件">
+            <div class="layer-panel final-panel">
+              <div class="layer-head">
+                <h3>🕰️ 最終案件：一顆砂粒的時空旅程</h3>
+                <button type="button" class="close-btn" data-close aria-label="關閉">✕</button>
+              </div>
+              <p class="final-intro"></p>
+              <ol class="final-slots"></ol>
+              <p class="deduce-label">依照時間順序，點選下一張筆記：</p>
+              <div class="final-pool"></div>
+              <p class="final-feedback" hidden></p>
+              <button type="button" class="btn btn-primary btn-lg" id="final-done" hidden>領取偵探證書 🏅</button>
+            </div>
+          </div>
+
+          <!-- 證書 -->
+          <div class="game-layer game-cert" hidden role="dialog" aria-modal="true" aria-label="偵探證書">
+            <div class="layer-panel cert-panel">
+              <p class="cert-kicker">阿岩地質研究室 頒發</p>
+              <p class="cert-medal" aria-hidden="true">🏅</p>
+              <h3 class="cert-title"></h3>
+              <p class="cert-stars"></p>
+              <p class="cert-detail"></p>
+              <button type="button" class="btn btn-primary" id="cert-map">回到地圖</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-teacher">
+          <h2>👩‍🏫 給老師</h2>
+          <ul>
+            <li><strong>13 塊標本</strong>：火成岩 4（安山岩、浮石、玄武岩、花崗岩）、沉積岩 4（砂岩、頁岩、礫岩、石灰岩）、變質岩 3（大理岩、片岩、片麻岩）、人造石材 2（磨石子、洗石子）。</li>
+            <li><strong>思考陷阱</strong>：石灰岩和大理岩都會冒泡、頁岩和板岩很像、片麻岩和花崗岩都有晶體、洗石子很像礫岩，學生必須組合多個證據才能分辨。</li>
+            <li><strong>關鍵證據</strong>：答案正確但選了「其他岩石也有」的證據，不能結案，引導學生思考哪個證據能區分選項。</li>
+            <li><strong>效率星</strong>：用 2 種以內的工具破案才有，鼓勵學生先提出假設、再選最有效的工具，而不是全部試一遍。</li>
+            <li>每區破案後有一題<strong>博士的思考題</strong>（柱狀節理、差異侵蝕、礦物定向排列、天然與人造），最後是<strong>岩石循環排序</strong>。</li>
+            <li>進度會存在這台裝置的瀏覽器裡，可以分次遊玩；地圖下方可「重新開始」。</li>
+          </ul>
+          <p><a href="rocks.html">← 回到認識岩石（影片與小測驗）</a></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>本站資訊僅供參考，實際應變請依政府單位最新公告為準。</p>
+      <p><a href="#main">回到頂端 ↑</a></p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/rock-art.js"></script>
+  <script src="js/rock-game.js"></script>
+</body>
+</html>
