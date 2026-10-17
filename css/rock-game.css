@@ -1377,3 +1377,99 @@
   justify-content: center;
   gap: 10px;
 }
+
+/* ===== 刺激感：升級、突發事件、晃動 ===== */
+.hud-level {
+  background: #c2410c;
+  font-weight: 800;
+}
+
+.game-stage.hz-shake svg {
+  animation: stage-shake 0.4s ease;
+}
+
+@keyframes stage-shake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-6px, 3px); }
+  40% { transform: translate(5px, -3px); }
+  60% { transform: translate(-4px, 2px); }
+  80% { transform: translate(3px, -1px); }
+}
+
+/* 豪雨 */
+.game-stage.hz-rain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(105deg, rgba(200, 220, 240, 0.45) 0 1px, transparent 1px 14px),
+    rgba(30, 40, 60, 0.38);
+  background-size: 40px 40px, auto;
+  animation: rain-fall 0.35s linear infinite;
+}
+
+@keyframes rain-fall {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: -10px 40px, 0 0; }
+}
+
+/* 火山彈 */
+.game-stage .bomb-shadow {
+  opacity: 0.35;
+  animation: shadow-grow 2.4s ease-in forwards;
+}
+
+.game-stage .bomb-fall {
+  animation: bomb-drop 0.35s ease-in both;
+}
+
+@keyframes shadow-grow {
+  from { transform: scale(0.4); opacity: 0.15; }
+  to { transform: scale(1.2); opacity: 0.6; }
+}
+
+@keyframes bomb-drop {
+  from { transform: translateY(-150px); }
+  to { transform: translateY(0); }
+}
+
+/* 瘋狗浪 */
+.game-stage .rogue-wave {
+  animation: wave-rise 3s ease-in forwards;
+}
+
+.game-stage .rogue-wave.crash {
+  animation: wave-crash 1.2s ease-in forwards;
+}
+
+@keyframes wave-rise {
+  from { transform: translateY(30px) scale(0.6); opacity: 0.6; }
+  to { transform: translateY(0) scale(1.4); opacity: 1; }
+}
+
+@keyframes wave-crash {
+  from { transform: scale(1.4); opacity: 1; }
+  to { transform: translateX(-300px) scale(2.2, 1.2); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-stage.hz-shake svg,
+  .game-stage.hz-rain::before {
+    animation: none !important;
+  }
+}
+
+.game-stage .bomb-mark text {
+  animation: hud-blink 0.4s steps(2) infinite;
+}
+
+.game-stage .bomb-ring {
+  animation: ring-pulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes ring-pulse {
+  from { transform: scale(0.9); }
+  to { transform: scale(1.15); }
+}
