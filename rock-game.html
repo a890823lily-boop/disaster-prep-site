@@ -59,10 +59,12 @@
             <span class="hud-stat" id="hud-hearts" hidden></span>
             <span class="hud-stat" id="hud-tools" hidden></span>
             <span class="hud-stat hud-hazard" id="hud-hazard" hidden></span>
+            <span class="hud-stat hud-level" id="hud-level" hidden></span>
             <span class="hud-stat" id="hud-solved">🪨 0/13</span>
             <span class="hud-stat" id="hud-stars">⭐ 0</span>
             <button type="button" class="hud-btn" id="hud-book" aria-label="案件簿">📒<span>案件簿</span></button>
             <button type="button" class="hud-btn" id="hud-map" aria-label="地圖">🗺️<span>地圖</span></button>
+            <button type="button" class="hud-btn" id="hud-sound" aria-label="關閉聲音">🔊</button>
             <button type="button" class="hud-btn" id="hud-full" aria-label="全螢幕">⛶</button>
           </div>
 
@@ -95,7 +97,7 @@
                 <li><strong>⭐ 星星</strong>一次推理成功 ⭐、2 種工具以內 ⭐、正確破案 ⭐</li>
                 <li><strong>❤️ 信譽</strong>每區 3 顆。推理錯誤、被現場危險波及都會扣一顆，歸零就案件失敗</li>
                 <li><strong>🧰 補給</strong>每區工具次數有限，稀鹽酸只有 3 滴，用完還沒破案也會失敗</li>
-                <li><strong>⚠️ 危險</strong>火山噴氣、漲潮、落石、地震演練，注意現場安全！</li>
+                <li><strong>⚠️ 危險</strong>火山噴氣、漲潮、落石、地震演練，還有火山彈、瘋狗浪、豪雨、餘震等突發事件。待越久危險等級越高！</li>
               </ul>
               <button type="button" class="btn btn-primary btn-lg" id="game-start-btn">▶ 開始調查</button>
             </div>
@@ -115,6 +117,7 @@
               <div class="layer-foot">
                 <label class="practice-toggle"><input type="checkbox" id="practice-toggle"> 🛡️ 練習模式（關閉現場危險）</label>
                 <button type="button" class="btn btn-outline" id="map-book">📒 打開案件簿</button>
+                <button type="button" class="btn btn-outline" id="map-sound">🔊 聲音：開</button>
                 <button type="button" class="link-btn" id="game-reset">重新開始</button>
               </div>
             </div>
@@ -245,6 +248,8 @@
             <li><strong>效率星</strong>：用 2 種以內的工具破案才有，鼓勵學生先提出假設、再選最有效的工具，而不是全部試一遍。</li>
             <li><strong>失敗條件</strong>：每區有 3 顆信譽值（推理錯誤或被危險波及扣一顆）與有限的工具補給（每塊標本約 2 次、稀鹽酸 3 滴）。信譽歸零、補給用完卻還有標本沒證據、或潮水淹沒潮間帶，就會案件失敗；已破案的標本會保留，重試破案最多 2 顆星。</li>
             <li><strong>現場危險（結合防災）</strong>：火山噴氣要離開警示區、海邊漲潮要先調查會被淹沒的地方、落石警報要躲進隧道或防落石棚、地震演練要立刻「趴下掩護」。地圖下方可開啟<strong>練習模式</strong>關閉現場危險。</li>
+            <li><strong>危險升級與突發事件</strong>：在同一區待超過 1 分鐘、2 分鐘，危險等級升到 Lv2、Lv3，警報更頻繁、反應時間更短；另有隨機突發事件（火山彈要閃開地上黑影、瘋狗浪要遠離岸邊、豪雨使落石加倍、地震後可能有餘震）。</li>
+            <li><strong>音效</strong>：右上角 🔊 可以關閉聲音；Android 手機在危險時會震動。</li>
             <li>每區破案後有一題<strong>博士的思考題</strong>（柱狀節理、差異侵蝕、礦物定向排列、天然與人造），最後是<strong>岩石循環排序</strong>。</li>
             <li>進度會存在這台裝置的瀏覽器裡，可以分次遊玩；地圖下方可「重新開始」。</li>
           </ul>

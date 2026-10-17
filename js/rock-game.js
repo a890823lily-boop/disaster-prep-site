@@ -228,6 +228,7 @@
         '⚠️ 注意：火山會噴出有毒氣體！看到步道出現紅色警示區，要趕快離開。'
       ],
       hazard: { type: 'gas', zone: [18, 228], every: [10, 15], warn: 4 },
+      event: { type: 'bombs' },
       rocks: [
         { id: 'andesite', x: 120 },
         { id: 'pumice', x: 310, hidden: 'driftwood' },
@@ -249,6 +250,7 @@
         '⚠️ 注意：潮水正在上漲！潮間帶被淹沒之前一定要破案。到海邊要隨時注意潮汐，漲潮時不要逗留。'
       ],
       hazard: { type: 'tide', duration: 240, flood: 450 },
+      event: { type: 'wave', safeX: 320 },
       rocks: [
         { id: 'sandstone', x: 105 },
         { id: 'shale', x: 250 },
@@ -271,6 +273,7 @@
         '⚠️ 注意：落石警報響起時，要馬上躲進隧道或防落石棚！'
       ],
       hazard: { type: 'rockfall', shelters: [[252, 308, '隧道'], [440, 500, '防落石棚']], every: [10, 14], warn: 4.5 },
+      event: { type: 'rain' },
       rocks: [
         { id: 'marble', x: 120 },
         { id: 'schist', x: 330 },
@@ -292,6 +295,7 @@
         '⚠️ 今天學校在做地震演練！一感覺到搖晃，就要立刻按「趴下掩護」，不要再走動。'
       ],
       hazard: { type: 'quake', every: [13, 19], react: 3 },
+      event: { type: 'aftershock' },
       rocks: [
         { id: 'granite', x: 115 },
         { id: 'terrazzo', x: 345 },
@@ -329,7 +333,7 @@
   var state = load();
 
   function blank() {
-    return { solved: {}, revealed: {}, think: {}, thinkDone: {}, final: 0, introSeen: {}, runs: {}, practice: false };
+    return { solved: {}, revealed: {}, think: {}, thinkDone: {}, final: 0, introSeen: {}, runs: {}, practice: false, muted: false };
   }
 
   function load() {
@@ -365,6 +369,97 @@
 
   function sceneSolved(scene) {
     return scene.rocks.every(function (r) { return state.solved[r.id]; });
+  }
+
+  /* ---------- 音效（Web Audio 即時合成，不需要音檔） ---------- */
+
+  var Sound = (function () {
+    var ctx = null, master = null, noiseBuf = null, muted = false;
+
+    function init() {
+      if (ctx) return;
+      try {
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        master = ctx.createGain();
+        master.gain.value = 0.35;
+        master.connect(ctx.destination);
+        noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+        var d = noiseBuf.getChannelData(0);
+        for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      } catch (e) { ctx = null; }
+    }
+
+    function ok() { return ctx && !muted; }
+
+    function tone(f, dur, o) {
+      o = o || {};
+      var t = ctx.currentTime + (o.delay || 0);
+      var osc = ctx.createOscillator(), g = ctx.createGain();
+      osc.type = o.type || 'sine';
+      osc.frequency.setValueAtTime(f, t);
+      if (o.to) osc.frequency.exponentialRampToValueAtTime(o.to, t + dur);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(o.vol || 0.2, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      osc.connect(g); g.connect(master);
+      osc.start(t); osc.stop(t + dur + 0.05);
+    }
+
+    function noise(dur, o) {
+      o = o || {};
+      var t = ctx.currentTime + (o.delay || 0);
+      var src = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+      src.buffer = noiseBuf; src.loop = true;
+      f.type = o.filter || 'lowpass';
+      f.frequency.setValueAtTime(o.freq || 1000, t);
+      if (o.freqTo) f.frequency.exponentialRampToValueAtTime(o.freqTo, t + dur);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(o.vol || 0.2, t + (o.attack || 0.01));
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      src.connect(f); f.connect(g); g.connect(master);
+      src.start(t); src.stop(t + dur + 0.05);
+    }
+
+    var SFX = {
+      step: function () { noise(0.05, { freq: 700, vol: 0.06 }); },
+      click: function () { tone(660, 0.06, { type: 'square', vol: 0.08 }); },
+      lens: function () { tone(880, 0.15, { to: 1400, vol: 0.12 }); },
+      light: function () { tone(1200, 0.25, { type: 'triangle', vol: 0.08 }); tone(1800, 0.2, { type: 'triangle', vol: 0.05, delay: 0.08 }); },
+      drip: function () { tone(900, 0.15, { to: 300, vol: 0.15 }); },
+      fizz: function () { SFX.drip(); noise(1.4, { filter: 'highpass', freq: 3500, vol: 0.12, attack: 0.2, delay: 0.5 }); },
+      fizzWeak: function () { SFX.drip(); noise(0.6, { filter: 'highpass', freq: 4000, vol: 0.05, attack: 0.1, delay: 0.5 }); },
+      plop: function () { noise(0.25, { freq: 500, vol: 0.2 }); tone(320, 0.25, { to: 110, vol: 0.18, delay: 0.05 }); },
+      discover: function () { tone(784, 0.1, { vol: 0.15 }); tone(1175, 0.2, { vol: 0.15, delay: 0.1 }); },
+      correct: function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, 0.16, { type: 'triangle', vol: 0.16, delay: i * 0.09 }); }); },
+      wrong: function () { tone(220, 0.4, { type: 'sawtooth', to: 110, vol: 0.12 }); },
+      alarm: function () { for (var i = 0; i < 4; i++) tone(i % 2 ? 680 : 980, 0.22, { type: 'square', vol: 0.07, delay: i * 0.22 }); },
+      beat: function () { tone(70, 0.12, { vol: 0.35 }); tone(60, 0.12, { vol: 0.25, delay: 0.16 }); },
+      hit: function () { noise(0.35, { freq: 400, vol: 0.5 }); tone(110, 0.35, { to: 40, vol: 0.35 }); },
+      rumble: function () { noise(2.6, { freq: 140, vol: 0.55, attack: 0.3 }); },
+      whistle: function () { tone(1600, 1.2, { to: 350, vol: 0.08 }); },
+      boom: function () { noise(0.7, { freq: 300, vol: 0.55 }); tone(80, 0.6, { to: 30, vol: 0.4 }); },
+      wave: function () { noise(2.6, { filter: 'bandpass', freq: 300, freqTo: 1200, vol: 0.35, attack: 1.4 }); },
+      rain: function () { noise(4, { filter: 'highpass', freq: 2000, vol: 0.1, attack: 0.8 }); },
+      safe: function () { tone(660, 0.12, { vol: 0.12 }); tone(880, 0.18, { vol: 0.12, delay: 0.1 }); },
+      levelup: function () { tone(330, 0.2, { type: 'square', vol: 0.08 }); tone(440, 0.2, { type: 'square', vol: 0.08, delay: 0.2 }); tone(554, 0.3, { type: 'square', vol: 0.08, delay: 0.4 }); },
+      fail: function () { [392, 330, 262, 196].forEach(function (f, i) { tone(f, 0.3, { type: 'triangle', vol: 0.16, delay: i * 0.22 }); }); },
+      fanfare: function () { [523, 659, 784, 1047, 784, 1047].forEach(function (f, i) { tone(f, i === 5 ? 0.5 : 0.14, { type: 'triangle', vol: 0.16, delay: i * 0.12 }); }); }
+    };
+
+    return {
+      init: init,
+      play: function (name) {
+        if (!ok()) return;
+        if (ctx.state === 'suspended') ctx.resume();
+        try { SFX[name](); } catch (e) { /* 忽略 */ }
+      },
+      setMuted: function (m) { muted = m; }
+    };
+  })();
+
+  function buzz(pattern) {
+    if (state.muted) return;
+    try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) { /* 忽略 */ }
   }
 
   /* ---------- 小工具 ---------- */
@@ -560,6 +655,8 @@
       hudHearts: $('#hud-hearts', game),
       hudTools: $('#hud-tools', game),
       hudHazard: $('#hud-hazard', game),
+      hudLevel: $('#hud-level', game),
+      hudSound: $('#hud-sound', game),
       practice: $('#practice-toggle', game)
     };
 
@@ -572,6 +669,10 @@
     var modalOpen = false;
     var run = null;
     var hz = { phase: 'idle', t: 0 };
+    var ev = { phase: 'idle', t: 0 };
+    var sceneTime = 0;
+    var dangerLevel = 1;
+    var stepT = 0;
 
     /* ===== HUD ===== */
     function updateHud() {
@@ -590,6 +691,8 @@
         els.hudHazard.textContent = '🌊 潮位 ' + Math.min(100, Math.round(run.tide * 100)) + '%';
         els.hudHazard.classList.toggle('danger', run.tide >= 0.75);
       }
+      els.hudLevel.hidden = !(show && dangerLevel > 1 && hazardActive());
+      els.hudLevel.textContent = '⚠️ Lv' + dangerLevel;
     }
 
     var toastTimer;
@@ -758,6 +861,10 @@
     }
 
     function hazardLayer() {
+      return hazardBase() + '<g class="hz-ev"></g>';
+    }
+
+    function hazardBase() {
       var H = scene.hazard;
       if (H.type === 'gas') {
         return '<g class="hz-gas-zone"><rect x="' + H.zone[0] + '" y="20" width="' + (H.zone[1] - H.zone[0]) + '" height="' + (GROUND - 20) + '" fill="#ef4444"/>' +
@@ -782,15 +889,138 @@
     function rand(range) { return range[0] + Math.random() * (range[1] - range[0]); }
 
     function clearHazard() {
-      hz = { phase: 'idle', t: 0 };
-      els.stage.classList.remove('hz-warn', 'hz-quake');
+      hz = { phase: 'idle', t: 0, beat: 0 };
+      ev = { phase: 'idle', t: 0, beat: 0 };
+      els.stage.classList.remove('hz-warn', 'hz-quake', 'hz-rain');
       els.action.classList.remove('duck');
+      var box = els.svg && $('.hz-ev', els.svg);
+      if (box) box.innerHTML = '';
     }
 
     function resetHazard() {
       clearHazard();
+      sceneTime = 0;
+      dangerLevel = 1;
+      hz.t = nextDelay();
+      ev.t = rand([22, 38]);
+    }
+
+    // 危險升級：待越久，警報越頻繁、反應時間越短；豪雨時落石加倍
+    function nextDelay() {
       var H = scene.hazard;
-      hz.t = H.every ? rand(H.every) : 0;
+      if (!H.every) return 0;
+      var f = [1, 0.75, 0.55][dangerLevel - 1];
+      if (els.stage.classList.contains('hz-rain')) f *= 0.5;
+      return rand(H.every) * f;
+    }
+
+    function warnTime() {
+      return Math.max(2.6, scene.hazard.warn - (dangerLevel - 1) * 0.6 - (els.stage.classList.contains('hz-rain') ? 0.8 : 0));
+    }
+
+    function updateLevel(dt) {
+      sceneTime += dt;
+      var lv = sceneTime >= 120 ? 3 : sceneTime >= 60 ? 2 : 1;
+      if (lv > dangerLevel) {
+        dangerLevel = lv;
+        updateHud();
+        Sound.play('levelup');
+        toast('⚠️ 危險升級 Lv' + lv + '！警報會更頻繁、反應時間更短，快點破案！');
+      }
+    }
+
+    function heartbeat(obj, dt) {
+      obj.beat -= dt;
+      if (obj.beat <= 0) { Sound.play('beat'); obj.beat = 0.55; }
+    }
+
+    function eventTick(dt) {
+      var E = scene.event;
+      if (!E || E.type === 'aftershock') return;
+      if (hz.phase === 'warn' || hz.phase === 'quake') return;
+      ev.t -= dt;
+      if (ev.phase === 'warn') heartbeat(ev, dt);
+      if (ev.phase === 'idle' && ev.t <= 0) {
+        startEvent();
+      } else if (ev.phase === 'warn' && ev.t <= 0) {
+        eventImpact();
+      } else if (ev.phase === 'rain' && ev.t <= 0) {
+        els.stage.classList.remove('hz-rain');
+        toast('🌤️ 雨停了，落石頻率恢復正常。');
+        ev.phase = 'cool'; ev.t = 1;
+      } else if (ev.phase === 'cool' && ev.t <= 0) {
+        ev.phase = 'idle';
+        ev.t = rand([30, 48]) * [1, 0.8, 0.65][dangerLevel - 1];
+      }
+    }
+
+    function startEvent() {
+      var E = scene.event;
+      var box = $('.hz-ev', els.svg);
+      ev.beat = 0;
+      if (E.type === 'bombs') {
+        var xs = [det.x, det.x - 40, det.x + 40].map(function (x) { return Math.max(20, Math.min(scene.width - 20, x)); });
+        ev.spots = xs;
+        box.innerHTML = xs.map(function (x) {
+          return '<g class="bomb-mark"><ellipse class="bomb-shadow" cx="' + x.toFixed(1) + '" cy="' + (GROUND + 1) + '" rx="15" ry="4.5" fill="#111"/>' +
+            '<ellipse class="bomb-ring" cx="' + x.toFixed(1) + '" cy="' + (GROUND + 1) + '" rx="17" ry="5.5" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 3"/>' +
+            '<text x="' + x.toFixed(1) + '" y="' + (GROUND - 8) + '" text-anchor="middle" font-size="12" font-weight="900" fill="#ef4444">▼</text></g>';
+        }).join('');
+        ev.phase = 'warn';
+        ev.t = Math.max(1.8, 2.6 - (dangerLevel - 1) * 0.3);
+        Sound.play('whistle');
+        buzz(200);
+        toast('🌋 火山彈飛來了！快離開地上的黑影！');
+      } else if (E.type === 'wave') {
+        // 浪從目前畫面的右邊出現，玩家一定看得到
+        var wx = Math.min(scene.width - 10, camX() + VIEW_W - 6);
+        box.innerHTML = '<g class="rogue-wave"><path d="M' + wx + ' ' + GROUND + ' q-30 -50 -70 -40 q30 6 30 40 z" fill="#2b7fb5"/>' +
+          '<path d="M' + (wx - 70) + ' ' + (GROUND - 40) + ' q14 -6 24 4" stroke="#e0f2fe" stroke-width="4" fill="none"/>' +
+          '<text x="' + (wx - 40) + '" y="' + (GROUND - 56) + '" text-anchor="middle" font-size="11" font-weight="900" fill="#b91c1c">← 快跑！</text></g>';
+        ev.phase = 'warn';
+        ev.t = Math.max(2.5, 3.6 - (dangerLevel - 1) * 0.4);
+        Sound.play('wave');
+        buzz([150, 80, 150]);
+        toast('🌊 瘋狗浪來了！快遠離岸邊，退到女王頭的左邊！');
+      } else if (E.type === 'rain') {
+        els.stage.classList.add('hz-rain');
+        ev.phase = 'rain';
+        ev.t = 16;
+        Sound.play('rain');
+        toast('🌧️ 豪雨特報！視線變差，落石會更頻繁！');
+        if (hz.phase === 'idle') hz.t = Math.min(hz.t, nextDelay());
+      }
+    }
+
+    function eventImpact() {
+      var E = scene.event;
+      var box = $('.hz-ev', els.svg);
+      ev.phase = 'cool';
+      ev.t = 1.5;
+      if (E.type === 'bombs') {
+        box.innerHTML = ev.spots.map(function (x, i) {
+          return '<circle class="bomb-fall" style="animation-delay:' + (i * 0.05) + 's" cx="' + x.toFixed(1) + '" cy="' + (GROUND - 6) + '" r="7" fill="#3f2a1d" stroke="#ff7b1a" stroke-width="2"/>';
+        }).join('');
+        Sound.play('boom');
+        var struck = ev.spots.some(function (x) { return Math.abs(det.x - x) < 13; });
+        if (struck) hit('被火山彈砸中了！');
+        else { Sound.play('safe'); toast('😮‍💨 閃過了！火山彈落在旁邊。'); }
+        setTimeout(function () { if (box) box.innerHTML = ''; }, 1200);
+      } else if (E.type === 'wave') {
+        var w = $('.rogue-wave', els.svg);
+        if (w) w.classList.add('crash');
+        if (det.x > E.safeX) {
+          hit('被瘋狗浪捲到，嗆了好幾口水！');
+          det.x = E.safeX - 30;
+          det.target = null;
+          updateCamera();
+          findNear();
+        } else {
+          Sound.play('safe');
+          toast('😮‍💨 好險！你離岸邊夠遠。看海要遠離岸邊和消波塊。');
+        }
+        setTimeout(function () { if (box) box.innerHTML = ''; }, 1400);
+      }
     }
 
     function hazardActive() {
@@ -816,7 +1046,10 @@
       var H = scene.hazard;
       var exploring = !modalOpen && els.dialog.hidden;
 
+      if (exploring) updateLevel(dt);
+
       if (H.type === 'tide') {
+        if (exploring) eventTick(dt);
         // 潮水在調查時也會上漲，要規劃調查順序
         if (!els.dialog.hidden || (modalOpen && els.inv.hidden)) return;
         var before = run.tide;
@@ -831,22 +1064,32 @@
       }
 
       if (!exploring) return;
+      eventTick(dt);
       hz.t -= dt;
+      if (hz.phase === 'warn') heartbeat(hz, dt);
       if (hz.phase === 'idle' && hz.t <= 0) {
         if (H.type === 'quake') {
+          var after = !!hz.nextAfter;
+          hz.nextAfter = false;
+          hz.isAfter = after;
           hz.phase = 'quake';
-          hz.t = H.react;
+          hz.t = after ? 2 : Math.max(2.2, H.react - (dangerLevel - 1) * 0.4);
           hz.ducked = false;
           keys = {};
           det.target = null;
           els.stage.classList.add('hz-quake');
           els.action.classList.add('duck');
           findNear();
-          toast('📳 地震！馬上「趴下、掩護、穩住」！');
+          Sound.play('rumble');
+          buzz([400, 100, 400, 100, 400]);
+          toast(after ? '📳 餘震！又搖了，快趴下！' : '📳 地震！馬上「趴下、掩護、穩住」！');
         } else {
           hz.phase = 'warn';
-          hz.t = H.warn;
+          hz.t = warnTime();
+          hz.beat = 0;
           els.stage.classList.add('hz-warn');
+          Sound.play('alarm');
+          buzz(300);
           toast(H.type === 'gas' ? '⚠️ 火山即將噴氣！快離開紅色警示區！' : '⚠️ 落石警報！快躲進隧道或防落石棚！');
         }
       } else if (hz.phase === 'warn' && hz.t <= 0) {
@@ -859,8 +1102,15 @@
         els.action.classList.remove('duck');
         hz.phase = 'cool';
         hz.t = 1;
+        // 大地震後常有餘震
+        if (!hz.isAfter && Math.random() < 0.6) {
+          hz.phase = 'idle';
+          hz.t = 2.5 + Math.random() * 2.5;
+          hz.nextAfter = true;
+        }
         if (hz.ducked) {
-          toast('✅ 做得好！趴下、掩護、穩住，搖晃停止了。');
+          Sound.play('safe');
+          toast('✅ 做得好！趴下、掩護、穩住，搖晃停止了。' + (hz.nextAfter ? '小心餘震！' : ''));
           var d = $('.det', els.svg);
           if (d) d.classList.remove('ducking');
         } else {
@@ -869,7 +1119,7 @@
         findNear();
       } else if (hz.phase === 'cool' && hz.t <= 0) {
         hz.phase = 'idle';
-        hz.t = H.every ? rand(H.every) : 0;
+        hz.t = nextDelay();
       }
     }
 
@@ -878,8 +1128,9 @@
       if (H.type === 'gas') {
         var g = $('.hz-gas', els.svg);
         if (g) { g.classList.remove('puff'); void g.getBBox(); g.classList.add('puff'); }
+        Sound.play('rumble');
         if (det.x >= H.zone[0] && det.x <= H.zone[1]) hit('吸到火山氣體，頭好暈！');
-        else toast('😮‍💨 好險！你離開了警示區。');
+        else { Sound.play('safe'); toast('😮‍💨 好險！你離開了警示區。'); }
       } else if (H.type === 'rockfall') {
         var box = $('.hz-fall', els.svg);
         var out = '';
@@ -888,7 +1139,8 @@
           out += '<path class="falling" style="animation-delay:' + (i * 0.08) + 's" d="M' + x.toFixed(1) + ' 0 l7 -4 l6 4 l-2 7 l-9 1 z" fill="#78716c"/>';
         }
         box.innerHTML = out;
-        if (inShelter()) toast('😮‍💨 好險！你躲進了安全的地方。');
+        Sound.play('boom');
+        if (inShelter()) { Sound.play('safe'); toast('😮‍💨 好險！你躲進了安全的地方。'); }
         else hit('被落石擊中了！');
       }
     }
@@ -914,9 +1166,11 @@
       save();
       updateHud();
       toast('💥 ' + msg + '　❤️ -1');
-      els.stage.classList.remove('hz-hit');
+      Sound.play('hit');
+      buzz([200, 80, 300]);
+      els.stage.classList.remove('hz-hit', 'hz-shake');
       void els.stage.offsetWidth;
-      els.stage.classList.add('hz-hit');
+      els.stage.classList.add('hz-hit', 'hz-shake');
       if (run.hearts <= 0) {
         setTimeout(function () {
           fail('偵探信譽值歸零了。', '在現場要注意安全，也不能急著下結論。');
@@ -927,6 +1181,8 @@
     /* ===== 案件失敗 ===== */
     function fail(reason, advice) {
       clearHazard();
+      Sound.play('fail');
+      buzz([500, 150, 500]);
       keys = {};
       det.target = null;
       $('.fail-reason', els.fail).textContent = reason;
@@ -1046,6 +1302,8 @@
           if (scene.hazard.type === 'tide' && run && run.tide >= 1 && !state.practice) maxX = scene.hazard.flood - 20;
           det.x = Math.max(12, Math.min(maxX, det.x + dir * SPEED * dt));
           detNode.classList.add('walking');
+          stepT -= dt;
+          if (stepT <= 0) { Sound.play('step'); stepT = 0.28; }
           updateCamera();
           findNear();
         } else {
@@ -1060,6 +1318,7 @@
       if (hz.phase === 'quake') {
         if (!hz.ducked) {
           hz.ducked = true;
+          Sound.play('click');
           var d = $('.det', els.svg);
           if (d) d.classList.add('ducking');
           findNear();
@@ -1075,6 +1334,7 @@
         if (c) c.classList.add('moved');
         var s = $('.specimen[data-rock="' + t.rock.id + '"]', els.svg);
         if (s) s.classList.remove('is-hidden');
+        Sound.play('discover');
         toast('🔎 發現了一塊可疑的石頭！');
         setTimeout(findNear, 50);
       } else if (t.kind === 'rock') {
@@ -1246,7 +1506,16 @@
       sup.classList.toggle('low', inv.run.tools <= 2);
     }
 
+    function toolSound(id) {
+      var R = inv.R;
+      if (id === 'lens') Sound.play('lens');
+      else if (id === 'light') Sound.play('light');
+      else if (id === 'acid') Sound.play(R.fizz === 'strong' ? 'fizz' : R.fizz === 'weak' ? 'fizzWeak' : 'drip');
+      else if (id === 'water') Sound.play('plop');
+    }
+
     function useTool(id) {
+      toolSound(id);
       if (inv.used.indexOf(id) < 0 && !inv.done) {
         if (inv.run.tools <= 0) return;
         if (id === 'acid' && inv.run.acid <= 0) return;
@@ -1343,6 +1612,8 @@
         updateHud();
         renderTools();
         msg += '（信譽 ❤️ -1，剩 ' + inv.run.hearts + '）';
+        Sound.play('wrong');
+        buzz(150);
         fb.textContent = msg;
         fb.hidden = false;
         fb.classList.remove('shake');
@@ -1364,6 +1635,7 @@
       s = Math.max(1, s);
       if (inv.run.retry) s = Math.min(2, s);
       state.solved[inv.id] = { stars: s, tools: inv.used.length };
+      Sound.play(inv.scene && sceneSolved(inv.scene) ? 'fanfare' : 'correct');
       save();
       inv.done = true;
       $('.inv-deduce', els.inv).hidden = true;
@@ -1428,6 +1700,7 @@
         b.addEventListener('click', function () {
           tries++;
           if (item.i === T.answer) {
+            Sound.play('correct');
             b.classList.add('is-correct');
             Array.prototype.forEach.call(opts.children, function (x) { x.disabled = true; });
             var first = tries === 1;
@@ -1438,6 +1711,7 @@
             fb.hidden = false;
             updateHud();
           } else {
+            Sound.play('wrong');
             b.classList.add('is-wrong');
             b.disabled = true;
           }
@@ -1526,6 +1800,7 @@
               state.final = Math.max(state.final || 0, s);
               save();
               updateHud();
+              Sound.play('fanfare');
               fb.textContent = '🎉 時空旅程完成！' + stars(s) + '　' + FINAL.explain;
               fb.className = 'final-feedback ok';
               fb.hidden = false;
@@ -1533,6 +1808,7 @@
             }
           } else {
             mistakes++;
+            Sound.play('wrong');
             b.classList.remove('shake');
             void b.offsetWidth;
             b.classList.add('shake');
@@ -1614,6 +1890,28 @@
       $('#game-start-btn', game).textContent = '▶ 開始調查';
       toast('已清除進度，從頭開始調查！');
     });
+
+    // 聲音：第一次點擊遊戲時啟動（瀏覽器規定要使用者互動後才能播放）
+    Sound.setMuted(!!state.muted);
+    var mapSound = $('#map-sound', game);
+    function syncSoundBtn() {
+      mapSound.textContent = state.muted ? '🔇 聲音：關' : '🔊 聲音：開';
+      els.hudSound.textContent = state.muted ? '🔇' : '🔊';
+      els.hudSound.setAttribute('aria-label', state.muted ? '開啟聲音' : '關閉聲音');
+      els.hudSound.setAttribute('aria-pressed', String(!state.muted));
+    }
+    syncSoundBtn();
+    game.addEventListener('pointerdown', function () { Sound.init(); }, true);
+    game.addEventListener('keydown', function () { Sound.init(); }, true);
+    function toggleSound() {
+      state.muted = !state.muted;
+      Sound.setMuted(state.muted);
+      save();
+      syncSoundBtn();
+      if (!state.muted) Sound.play('click');
+    }
+    els.hudSound.addEventListener('click', toggleSound);
+    mapSound.addEventListener('click', toggleSound);
 
     var fullBtn = $('#hud-full', game);
     if (!(game.requestFullscreen || game.webkitRequestFullscreen)) {
