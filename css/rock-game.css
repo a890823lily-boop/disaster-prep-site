@@ -1175,3 +1175,205 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+/* ===== 挑戰：信譽、補給、危險 ===== */
+.hud-stat[hidden] {
+  display: none;
+}
+
+.hud-hazard.danger {
+  background: #b91c1c;
+  animation: hud-blink 0.8s steps(2) infinite;
+}
+
+@keyframes hud-blink {
+  50% { opacity: 0.6; }
+}
+
+@media (max-width: 520px) {
+  .game-hud {
+    flex-wrap: wrap;
+  }
+  .hud-scene {
+    flex-basis: 100%;
+  }
+}
+
+.game-stage .hz-gas-zone {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.game-stage.hz-warn .hz-gas-zone {
+  animation: zone-flash 0.5s steps(2) infinite;
+}
+
+.game-stage .hz-gas {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.game-stage .hz-gas.puff {
+  animation: gas-puff 1.6s ease-out;
+}
+
+.game-stage .hz-shelter {
+  opacity: 0;
+}
+
+.game-stage.hz-warn .hz-shelter {
+  animation: zone-flash 0.5s steps(2) infinite;
+}
+
+.game-stage.hz-warn .warn-sign,
+.game-stage.hz-warn {
+  box-shadow: inset 0 0 0 4px #ef4444;
+}
+
+.game-stage .falling {
+  animation: rock-fall 0.7s ease-in forwards;
+}
+
+.game-stage.hz-quake .world {
+  animation: quake 0.18s linear infinite;
+}
+
+.game-stage .det.ducking .det-body {
+  transform: translateY(10px) scaleY(0.72);
+}
+
+.game-stage.hz-hit::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(239, 68, 68, 0.45);
+  animation: hit-flash 0.6s ease-out forwards;
+  pointer-events: none;
+}
+
+.game-stage .hz-tide {
+  transition: y 0.4s linear, height 0.4s linear;
+}
+
+.ctl-action.duck {
+  background: #ef4444;
+  color: #fff;
+  animation: duck-pulse 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes zone-flash {
+  0% { opacity: 0.45; }
+  50% { opacity: 0.15; }
+}
+
+@keyframes gas-puff {
+  0% { opacity: 0; transform: translateY(10px) scale(0.6); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-30px) scale(1.4); }
+}
+
+@keyframes rock-fall {
+  from { transform: translateY(0) rotate(0); }
+  to { transform: translateY(146px) rotate(220deg); }
+}
+
+@keyframes quake {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-3px, 1px); }
+  75% { transform: translate(3px, -1px); }
+}
+
+@keyframes hit-flash {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes duck-pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.04); }
+}
+
+.inv-supply {
+  margin: 8px 0 0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--bg-alt);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.inv-supply.low {
+  background: rgba(229, 57, 53, 0.12);
+  color: #b91c1c;
+}
+
+.inv-supply[hidden] {
+  display: none;
+}
+
+.tool-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.practice-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.practice-toggle input {
+  width: 20px;
+  height: 20px;
+}
+
+/* 案件失敗 */
+.fail-panel {
+  max-width: 480px;
+  text-align: center;
+  border: 3px solid #b91c1c;
+}
+
+.fail-stamp {
+  display: inline-block;
+  margin: 4px 0 8px;
+  padding: 4px 18px;
+  border: 4px solid #b91c1c;
+  border-radius: 8px;
+  color: #b91c1c;
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  transform: rotate(-6deg);
+}
+
+.fail-panel h3 {
+  margin: 0 0 8px;
+}
+
+.fail-reason {
+  font-weight: 700;
+}
+
+.fail-advice {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--bg-alt);
+  text-align: left;
+}
+
+.fail-kept {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.fail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}

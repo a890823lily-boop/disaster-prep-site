@@ -1,5 +1,5 @@
 /* 防災資訊網 Service Worker：預先快取所有檔案，讓 APP 離線也能開啟 */
-var CACHE_NAME = 'disaster-prep-v5';
+var CACHE_NAME = 'disaster-prep-v6';
 var PRECACHE = [
   './',
   'index.html',

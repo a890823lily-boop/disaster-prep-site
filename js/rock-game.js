@@ -18,6 +18,11 @@
   var SPEED = 80;            // 每秒移動距離（SVG 單位）
   var NEAR = 26;             // 靠近多少距離可以互動
   var EFFICIENT_TOOLS = 2;   // 用幾種以內的工具破案可得效率星
+  var HEARTS = 3;            // 每區的偵探信譽值
+  var ACID_DROPS = 3;        // 每區的稀鹽酸滴數
+
+  // 每區的工具補給：每塊標本 2 次，再多 2 次備用
+  function toolBudget(sc) { return sc.rocks.length * 2 + 2; }
 
   /* ---------- 岩石家族 ---------- */
 
@@ -219,8 +224,10 @@
       id: 'volcano', name: '火山海岸', place: '澎湖・大屯火山', width: 640, pin: [58, 124],
       intro: [
         '這裡是火山活動留下的海岸。遠方是大屯火山，海邊有一整排黑色的石柱。',
-        '博士的標本箱裡，有三塊石頭來自這裡。到處走走，靠近可疑的石頭就能調查。漂流木後面好像也藏了東西……'
+        '博士的標本箱裡，有三塊石頭來自這裡。到處走走，靠近可疑的石頭就能調查。漂流木後面好像也藏了東西……',
+        '⚠️ 注意：火山會噴出有毒氣體！看到步道出現紅色警示區，要趕快離開。'
       ],
+      hazard: { type: 'gas', zone: [18, 228], every: [10, 15], warn: 4 },
       rocks: [
         { id: 'andesite', x: 120 },
         { id: 'pumice', x: 310, hidden: 'driftwood' },
@@ -238,15 +245,17 @@
       id: 'coast', name: '奇岩海岸', place: '北海岸・野柳', width: 680, pin: [218, 26],
       intro: [
         '北海岸的野柳，到處都是被海浪和風雕刻過的奇怪岩石，還有有名的女王頭。',
-        '這裡有四塊標本要調查。潮間帶的水池裡，好像有東西在閃……'
+        '這裡有四塊標本要調查。潮間帶的水池裡，好像有東西在閃……',
+        '⚠️ 注意：潮水正在上漲！潮間帶被淹沒之前一定要破案。到海邊要隨時注意潮汐，漲潮時不要逗留。'
       ],
+      hazard: { type: 'tide', duration: 240, flood: 450 },
       rocks: [
         { id: 'sandstone', x: 105 },
         { id: 'shale', x: 250 },
         { id: 'conglomerate', x: 430 },
         { id: 'limestone', x: 580, hidden: 'pool' }
       ],
-      npcX: 640,
+      npcX: 185,
       think: {
         q: '野柳女王頭的「脖子」越來越細，為什麼？',
         options: ['頭部的岩石比較硬，脖子比較軟，被風和海浪侵蝕得比較快', '有遊客偷偷把脖子挖細', '脖子是石灰岩，被雨水溶掉了'],
@@ -258,8 +267,10 @@
       id: 'gorge', name: '大理石峽谷', place: '花蓮・太魯閣', width: 660, pin: [222, 140],
       intro: [
         '太魯閣峽谷的岩壁又高又陡，立霧溪在谷底奔流。注意落石！',
-        '這裡的三塊標本都經歷過地底的高溫高壓。草叢後面好像有一塊條紋石頭。'
+        '這裡的三塊標本都經歷過地底的高溫高壓。草叢後面好像有一塊條紋石頭。',
+        '⚠️ 注意：落石警報響起時，要馬上躲進隧道或防落石棚！'
       ],
+      hazard: { type: 'rockfall', shelters: [[252, 308, '隧道'], [440, 500, '防落石棚']], every: [10, 14], warn: 4.5 },
       rocks: [
         { id: 'marble', x: 120 },
         { id: 'schist', x: 330 },
@@ -277,8 +288,10 @@
       id: 'campus', name: '我們的校園', place: '學校', width: 640, pin: [150, 84],
       intro: [
         '最後回到熟悉的校園。校名石、走廊地板、操場邊……你們之前偵查過的地方！',
-        '小心，博士說這裡有「冒牌岩石」。天然的岩石，還是人做出來的？用證據說話！'
+        '小心，博士說這裡有「冒牌岩石」。天然的岩石，還是人做出來的？用證據說話！',
+        '⚠️ 今天學校在做地震演練！一感覺到搖晃，就要立刻按「趴下掩護」，不要再走動。'
       ],
+      hazard: { type: 'quake', every: [13, 19], react: 3 },
       rocks: [
         { id: 'granite', x: 115 },
         { id: 'terrazzo', x: 345 },
@@ -316,7 +329,7 @@
   var state = load();
 
   function blank() {
-    return { solved: {}, revealed: {}, think: {}, thinkDone: {}, final: 0, introSeen: {} };
+    return { solved: {}, revealed: {}, think: {}, thinkDone: {}, final: 0, introSeen: {}, runs: {}, practice: false };
   }
 
   function load() {
@@ -339,6 +352,16 @@
   }
 
   function solvedCount() { return Object.keys(state.solved).length; }
+
+  // 每區的挑戰狀態：信譽值、工具補給、已蒐集的證據、潮位
+  function newRun(sc, retry) {
+    return { hearts: HEARTS, tools: toolBudget(sc), acid: ACID_DROPS, evidence: {}, tide: 0, retry: !!retry };
+  }
+
+  function getRun(sc) {
+    if (!state.runs[sc.id]) state.runs[sc.id] = newRun(sc, false);
+    return state.runs[sc.id];
+  }
 
   function sceneSolved(scene) {
     return scene.rocks.every(function (r) { return state.solved[r.id]; });
@@ -453,7 +476,10 @@
           '<path d="M260 150 V112 Q280 96 300 112 V150 Z" fill="#3f3f46"/>' +
           ground(w, '#9a958e') +
           '<rect y="168" width="' + w + '" height="12" fill="#6fb6d9"/><path class="wave" d="M0 172 q10 -3 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0" stroke="#e0f2fe" stroke-width="1.5" fill="none"/>' +
-          warning(200, '小心落石') + sign(430, '立霧溪');
+          '<g><rect x="440" y="104" width="60" height="7" fill="#6b7280"/><path d="M440 104 L470 94 L500 104 Z" fill="#9ca3af"/>' +
+          '<rect x="443" y="111" width="4" height="39" fill="#6b7280"/><rect x="493" y="111" width="4" height="39" fill="#6b7280"/>' +
+          '<text x="470" y="102" text-anchor="middle" font-size="6.5" font-weight="700" fill="#fff">防落石棚</text></g>' +
+          warning(200, '小心落石') + sign(380, '立霧溪');
       case 'campus':
         return '' +
           '<rect width="' + w + '" height="180" fill="#cfe8f7"/>' +
@@ -529,7 +555,12 @@
       inv: $('.game-inv', game),
       think: $('.game-think', game),
       final: $('.game-final', game),
-      cert: $('.game-cert', game)
+      cert: $('.game-cert', game),
+      fail: $('.game-fail', game),
+      hudHearts: $('#hud-hearts', game),
+      hudTools: $('#hud-tools', game),
+      hudHazard: $('#hud-hazard', game),
+      practice: $('#practice-toggle', game)
     };
 
     var scene = null;
@@ -539,12 +570,26 @@
     var nearTarget = null;
     var detNode, worldNode, promptNode;
     var modalOpen = false;
+    var run = null;
+    var hz = { phase: 'idle', t: 0 };
 
     /* ===== HUD ===== */
     function updateHud() {
       els.hudStars.textContent = '⭐ ' + totalStars();
       els.hudSolved.textContent = '🪨 ' + solvedCount() + '/' + TOTAL_ROCKS;
       els.hudScene.textContent = scene ? scene.name + '・' + scene.place : '台灣地圖';
+      var show = !!(scene && run);
+      els.hudHearts.hidden = !show;
+      els.hudTools.hidden = !show;
+      els.hudHazard.hidden = !(show && scene.hazard.type === 'tide' && !sceneSolved(scene) && !state.practice);
+      if (show) {
+        els.hudHearts.textContent = '❤️'.repeat(run.hearts) + '🤍'.repeat(HEARTS - run.hearts);
+        els.hudHearts.setAttribute('aria-label', '信譽值 ' + run.hearts + ' / ' + HEARTS);
+        els.hudTools.textContent = '🧰 ' + run.tools + '・🧪 ' + run.acid;
+        els.hudTools.setAttribute('aria-label', '剩餘工具 ' + run.tools + ' 次，鹽酸 ' + run.acid + ' 滴');
+        els.hudHazard.textContent = '🌊 潮位 ' + Math.min(100, Math.round(run.tide * 100)) + '%';
+        els.hudHazard.classList.toggle('danger', run.tide >= 0.75);
+      }
     }
 
     var toastTimer;
@@ -557,7 +602,7 @@
 
     /* ===== 覆蓋層 ===== */
     function openLayer(layer) {
-      [els.map, els.book, els.inv, els.think, els.final, els.cert, els.start].forEach(function (l) {
+      [els.map, els.book, els.inv, els.think, els.final, els.cert, els.start, els.fail].forEach(function (l) {
         if (l !== layer) l.hidden = true;
       });
       layer.hidden = false;
@@ -568,7 +613,7 @@
     }
 
     function closeLayers() {
-      [els.map, els.book, els.inv, els.think, els.final, els.cert, els.start].forEach(function (l) { l.hidden = true; });
+      [els.map, els.book, els.inv, els.think, els.final, els.cert, els.start, els.fail].forEach(function (l) { l.hidden = true; });
       modalOpen = false;
       els.stage.focus({ preventScroll: true });
     }
@@ -639,6 +684,8 @@
     function openMap() {
       els.toast.hidden = true;
       scene = null;
+      run = null;
+      clearHazard();
       updateHud();
       renderMap();
       openLayer(els.map);
@@ -652,6 +699,14 @@
       det.facing = 1;
       det.target = null;
       det.onArrive = null;
+      run = getRun(sc);
+      // 上次失敗還沒重試就離開了：直接開始新的一輪
+      var drowned = sc.hazard.type === 'tide' && run.tide >= 1 && sc.rocks.some(function (r) { return r.x >= sc.hazard.flood && !state.solved[r.id]; });
+      if (run.hearts <= 0 || drowned) {
+        state.runs[sc.id] = run = newRun(sc, true);
+        save();
+      }
+      resetHazard();
       closeLayers();
       renderScene();
       updateHud();
@@ -686,6 +741,7 @@
           (state.thinkDone[scene.id] ? '' : '<g class="npc-mark"><circle cx="0" cy="-64" r="6" fill="#facc15"/><text x="0" y="-60.5" text-anchor="middle" font-size="9" font-weight="900">!</text></g>') + '</g>';
       }
 
+      parts += hazardLayer();
       parts += '<g class="det" transform="translate(' + det.x + ' ' + GROUND + ')">' + detectiveSVG() + '</g>';
       parts += '<g class="prompt" hidden><rect x="-30" y="-14" width="60" height="16" rx="8" fill="#1e3a8a"/><text x="0" y="-3" text-anchor="middle" font-size="8.5" font-weight="700" fill="#fff"></text></g>';
       parts += '</g>';
@@ -697,7 +753,206 @@
       promptNode = $('.prompt', els.svg);
       els.svg.setAttribute('aria-label', scene.name + '（' + scene.place + '）。用左右鍵或下方按鈕移動，靠近岩石按空白鍵調查。');
       updateCamera();
+      updateTide();
       findNear();
+    }
+
+    function hazardLayer() {
+      var H = scene.hazard;
+      if (H.type === 'gas') {
+        return '<g class="hz-gas-zone"><rect x="' + H.zone[0] + '" y="20" width="' + (H.zone[1] - H.zone[0]) + '" height="' + (GROUND - 20) + '" fill="#ef4444"/>' +
+          '<text x="' + ((H.zone[0] + H.zone[1]) / 2) + '" y="40" text-anchor="middle" font-size="11" font-weight="900" fill="#fff">⚠ 火山噴氣警示區</text></g>' +
+          '<g class="hz-gas">' + [0, 1, 2, 3, 4, 5].map(function (i) {
+            var x = H.zone[0] + 20 + i * ((H.zone[1] - H.zone[0] - 40) / 5);
+            return '<circle cx="' + x + '" cy="' + (GROUND - 12) + '" r="14" fill="#d9f99d" opacity=".75"/><circle cx="' + (x + 8) + '" cy="' + (GROUND - 30) + '" r="11" fill="#ecfccb" opacity=".7"/>';
+          }).join('') + '</g>';
+      }
+      if (H.type === 'tide') {
+        return '<rect class="hz-tide" x="' + (H.flood - 10) + '" y="' + GROUND + '" width="' + (scene.width - H.flood + 10) + '" height="0" fill="#3b8fc4" opacity=".8"/>';
+      }
+      if (H.type === 'rockfall') {
+        return H.shelters.map(function (sh) {
+          return '<rect class="hz-shelter" x="' + sh[0] + '" y="' + (GROUND - 2) + '" width="' + (sh[1] - sh[0]) + '" height="3" fill="#22c55e"/>';
+        }).join('') + '<g class="hz-fall"></g>';
+      }
+      return '';
+    }
+
+    /* ===== 現場危險 ===== */
+    function rand(range) { return range[0] + Math.random() * (range[1] - range[0]); }
+
+    function clearHazard() {
+      hz = { phase: 'idle', t: 0 };
+      els.stage.classList.remove('hz-warn', 'hz-quake');
+      els.action.classList.remove('duck');
+    }
+
+    function resetHazard() {
+      clearHazard();
+      var H = scene.hazard;
+      hz.t = H.every ? rand(H.every) : 0;
+    }
+
+    function hazardActive() {
+      return scene && run && !state.practice && !sceneSolved(scene) && els.fail.hidden;
+    }
+
+    function inShelter() {
+      return scene.hazard.shelters.some(function (sh) { return det.x >= sh[0] && det.x <= sh[1]; });
+    }
+
+    function updateTide() {
+      if (!scene || scene.hazard.type !== 'tide' || !run) return;
+      var r = $('.hz-tide', els.svg);
+      if (!r) return;
+      var level = state.practice ? 0 : Math.min(1, run.tide);
+      var hgt = level * 30;
+      r.setAttribute('y', String(GROUND + 30 - hgt - (level >= 1 ? 6 : 0)));
+      r.setAttribute('height', String(hgt + (level >= 1 ? 6 : 0)));
+    }
+
+    function hazardTick(dt) {
+      if (!hazardActive()) return;
+      var H = scene.hazard;
+      var exploring = !modalOpen && els.dialog.hidden;
+
+      if (H.type === 'tide') {
+        // 潮水在調查時也會上漲，要規劃調查順序
+        if (!els.dialog.hidden || (modalOpen && els.inv.hidden)) return;
+        var before = run.tide;
+        run.tide = Math.min(1, run.tide + dt / H.duration);
+        [0.5, 0.75, 0.9].forEach(function (th) {
+          if (before < th && run.tide >= th) toast('🌊 潮位 ' + Math.round(th * 100) + '%！潮間帶快被淹沒了！');
+        });
+        updateTide();
+        updateHud();
+        if (run.tide >= 1 && before < 1) floodCheck();
+        return;
+      }
+
+      if (!exploring) return;
+      hz.t -= dt;
+      if (hz.phase === 'idle' && hz.t <= 0) {
+        if (H.type === 'quake') {
+          hz.phase = 'quake';
+          hz.t = H.react;
+          hz.ducked = false;
+          keys = {};
+          det.target = null;
+          els.stage.classList.add('hz-quake');
+          els.action.classList.add('duck');
+          findNear();
+          toast('📳 地震！馬上「趴下、掩護、穩住」！');
+        } else {
+          hz.phase = 'warn';
+          hz.t = H.warn;
+          els.stage.classList.add('hz-warn');
+          toast(H.type === 'gas' ? '⚠️ 火山即將噴氣！快離開紅色警示區！' : '⚠️ 落石警報！快躲進隧道或防落石棚！');
+        }
+      } else if (hz.phase === 'warn' && hz.t <= 0) {
+        els.stage.classList.remove('hz-warn');
+        impact();
+        hz.phase = 'cool';
+        hz.t = 1.6;
+      } else if (hz.phase === 'quake' && hz.t <= 0) {
+        els.stage.classList.remove('hz-quake');
+        els.action.classList.remove('duck');
+        hz.phase = 'cool';
+        hz.t = 1;
+        if (hz.ducked) {
+          toast('✅ 做得好！趴下、掩護、穩住，搖晃停止了。');
+          var d = $('.det', els.svg);
+          if (d) d.classList.remove('ducking');
+        } else {
+          hit('地震時沒有趴下掩護，被掉落物砸到了！');
+        }
+        findNear();
+      } else if (hz.phase === 'cool' && hz.t <= 0) {
+        hz.phase = 'idle';
+        hz.t = H.every ? rand(H.every) : 0;
+      }
+    }
+
+    function impact() {
+      var H = scene.hazard;
+      if (H.type === 'gas') {
+        var g = $('.hz-gas', els.svg);
+        if (g) { g.classList.remove('puff'); void g.getBBox(); g.classList.add('puff'); }
+        if (det.x >= H.zone[0] && det.x <= H.zone[1]) hit('吸到火山氣體，頭好暈！');
+        else toast('😮‍💨 好險！你離開了警示區。');
+      } else if (H.type === 'rockfall') {
+        var box = $('.hz-fall', els.svg);
+        var out = '';
+        for (var i = 0; i < 5; i++) {
+          var x = det.x - 50 + i * 25 + (Math.random() * 10 - 5);
+          out += '<path class="falling" style="animation-delay:' + (i * 0.08) + 's" d="M' + x.toFixed(1) + ' 0 l7 -4 l6 4 l-2 7 l-9 1 z" fill="#78716c"/>';
+        }
+        box.innerHTML = out;
+        if (inShelter()) toast('😮‍💨 好險！你躲進了安全的地方。');
+        else hit('被落石擊中了！');
+      }
+    }
+
+    function floodCheck() {
+      var flood = scene.hazard.flood;
+      var lost = scene.rocks.filter(function (r) { return r.x >= flood && !state.solved[r.id]; });
+      if (det.x >= flood - 10) {
+        det.x = flood - 30;
+        det.target = null;
+        updateCamera();
+      }
+      if (lost.length) {
+        if (!els.inv.hidden) closeLayers();
+        fail('潮水淹沒了潮間帶，還沒破案的標本被海浪捲走了。', '下次要先觀察環境：會被淹沒的地方要先調查！');
+      } else {
+        toast('🌊 滿潮了！幸好潮間帶的標本已經破案。');
+      }
+    }
+
+    function hit(msg) {
+      run.hearts = Math.max(0, run.hearts - 1);
+      save();
+      updateHud();
+      toast('💥 ' + msg + '　❤️ -1');
+      els.stage.classList.remove('hz-hit');
+      void els.stage.offsetWidth;
+      els.stage.classList.add('hz-hit');
+      if (run.hearts <= 0) {
+        setTimeout(function () {
+          fail('偵探信譽值歸零了。', '在現場要注意安全，也不能急著下結論。');
+        }, 900);
+      }
+    }
+
+    /* ===== 案件失敗 ===== */
+    function fail(reason, advice) {
+      clearHazard();
+      keys = {};
+      det.target = null;
+      $('.fail-reason', els.fail).textContent = reason;
+      $('.fail-advice', els.fail).textContent = '🧓 阿岩博士：「' + advice + '」';
+      var kept = scene.rocks.filter(function (r) { return state.solved[r.id]; }).length;
+      $('.fail-kept', els.fail).textContent = '已破案的 ' + kept + ' 塊標本會保留；其餘標本要重新調查，重試破案的標本最多 2 顆星。';
+      openLayer(els.fail);
+    }
+
+    function retryScene() {
+      state.runs[scene.id] = newRun(scene, true);
+      save();
+      enterScene(scene);
+      toast('🔄 重新調查！信譽值和工具補給都恢復了。');
+    }
+
+    function checkSupply() {
+      if (!scene || !run || sceneSolved(scene) || run.tools > 0) return false;
+      var stuck = scene.rocks.filter(function (r) {
+        return !state.solved[r.id] && !(run.evidence[r.id] && run.evidence[r.id].length);
+      });
+      if (stuck.length) {
+        fail('工具補給用完了，還有標本完全沒有證據可以推理。', '每次用工具前先想一想：哪一種最能把選項分開？');
+        return true;
+      }
+      return false;
     }
 
     /* ===== 移動與鏡頭 ===== */
@@ -740,6 +995,12 @@
     }
 
     function findNear() {
+      if (hz.phase === 'quake') {
+        promptNode.hidden = true;
+        els.action.disabled = !!hz.ducked;
+        els.action.textContent = hz.ducked ? '🛡️ 穩住…' : '🛡️ 趴下掩護！';
+        return;
+      }
       var best = null;
       targets().forEach(function (t) {
         var d = Math.abs(t.x - det.x);
@@ -762,14 +1023,15 @@
     function loop(t) {
       var dt = Math.min(0.05, (t - last) / 1000 || 0);
       last = t;
-      if (scene && !modalOpen && els.dialog.hidden) {
+      if (scene) hazardTick(dt);
+      if (scene && !modalOpen && els.dialog.hidden && hz.phase !== 'quake') {
         var dir = 0;
         if (keys.left) dir -= 1;
         if (keys.right) dir += 1;
         if (dir) det.target = null;
         if (!dir && det.target != null) {
           var diff = det.target - det.x;
-          if (Math.abs(diff) < 2) {
+          if (Math.abs(diff) < 2 || (scene.hazard.type === 'tide' && run && run.tide >= 1 && !state.practice && det.target >= scene.hazard.flood - 10)) {
             det.target = null;
             var cb = det.onArrive;
             det.onArrive = null;
@@ -780,7 +1042,9 @@
         }
         if (dir) {
           det.facing = dir;
-          det.x = Math.max(12, Math.min(scene.width - 12, det.x + dir * SPEED * dt));
+          var maxX = scene.width - 12;
+          if (scene.hazard.type === 'tide' && run && run.tide >= 1 && !state.practice) maxX = scene.hazard.flood - 20;
+          det.x = Math.max(12, Math.min(maxX, det.x + dir * SPEED * dt));
           detNode.classList.add('walking');
           updateCamera();
           findNear();
@@ -793,6 +1057,15 @@
 
     /* ===== 互動 ===== */
     function interact(t) {
+      if (hz.phase === 'quake') {
+        if (!hz.ducked) {
+          hz.ducked = true;
+          var d = $('.det', els.svg);
+          if (d) d.classList.add('ducking');
+          findNear();
+        }
+        return;
+      }
       t = t || nearTarget;
       if (!t || modalOpen) return;
       if (t.kind === 'search') {
@@ -827,6 +1100,7 @@
     // 點畫面走過去；點到岩石就走過去並調查
     els.svg.addEventListener('click', function (e) {
       if (!scene || modalOpen || !els.dialog.hidden) return;
+      if (hz.phase === 'quake') { interact(); return; }
       var pt = els.svg.createSVGPoint();
       pt.x = e.clientX; pt.y = e.clientY;
       var p = pt.matrixTransform(els.svg.getScreenCTM().inverse());
@@ -846,7 +1120,10 @@
         return;
       }
       if (modalOpen) {
-        if (e.key === 'Escape') { if (scene) closeLayers(); }
+        if (e.key === 'Escape' && els.fail.hidden) {
+          if (!els.inv.hidden && inv) closeInvestigation();
+          else if (scene) closeLayers();
+        }
         return;
       }
       if (!scene) return;
@@ -865,7 +1142,8 @@
     function openInvestigation(id, sc, fromBook) {
       var R = ROCKS[id];
       var prev = state.solved[id];
-      inv = { id: id, R: R, scene: sc, fromBook: !!fromBook, used: [], family: null, name: null, key: null, wrong: 0, done: !!prev };
+      var r = getRun(sc);
+      inv = { id: id, R: R, scene: sc, run: r, fromBook: !!fromBook, used: prev ? [] : (r.evidence[id] || []).slice(), family: null, name: null, key: null, wrong: 0, done: !!prev };
 
       var box = els.inv;
       var num = Object.keys(ROCKS).indexOf(id) + 1;
@@ -953,18 +1231,31 @@
         b.innerHTML = '<span class="tool-icon"></span><span class="tool-name"></span><small></small>';
         b.querySelector('.tool-icon').textContent = t.icon;
         b.querySelector('.tool-name').textContent = t.name;
-        b.querySelector('small').textContent = used ? '已使用' : t.desc;
+        var out = !used && !inv.done && (inv.run.tools <= 0 || (t.id === 'acid' && inv.run.acid <= 0));
+        b.querySelector('small').textContent = used ? '已使用（再看一次）' : out ? '補給用完了' : t.desc;
+        b.disabled = out;
         b.addEventListener('click', function () { useTool(t.id); });
         wrap.appendChild(b);
       });
       var n = inv.used.length;
       $('.inv-toolcount', els.inv).textContent = inv.done ? '' :
-        '已使用 ' + n + ' 種工具' + (n <= EFFICIENT_TOOLS ? '（' + EFFICIENT_TOOLS + ' 種以內破案可得效率星 ⭐）' : '（超過 ' + EFFICIENT_TOOLS + ' 種，拿不到效率星了）');
+        '這塊用了 ' + n + ' 種工具' + (n <= EFFICIENT_TOOLS ? '（' + EFFICIENT_TOOLS + ' 種以內破案可得效率星 ⭐）' : '（超過 ' + EFFICIENT_TOOLS + ' 種，拿不到效率星了）');
+      var sup = $('.inv-supply', els.inv);
+      sup.hidden = inv.done;
+      sup.textContent = '本區補給剩下：🧰 工具 ' + inv.run.tools + ' 次・🧪 鹽酸 ' + inv.run.acid + ' 滴・信譽 ' + '❤️'.repeat(inv.run.hearts) + '🤍'.repeat(HEARTS - inv.run.hearts);
+      sup.classList.toggle('low', inv.run.tools <= 2);
     }
 
     function useTool(id) {
-      if (inv.used.indexOf(id) < 0) {
+      if (inv.used.indexOf(id) < 0 && !inv.done) {
+        if (inv.run.tools <= 0) return;
+        if (id === 'acid' && inv.run.acid <= 0) return;
+        inv.run.tools--;
+        if (id === 'acid') inv.run.acid--;
         inv.used.push(id);
+        inv.run.evidence[inv.id] = inv.used.slice();
+        save();
+        updateHud();
         renderTools();
         renderEvidence(id);
         renderDeduce();
@@ -1047,11 +1338,23 @@
       }
       if (msg) {
         inv.wrong++;
+        inv.run.hearts = Math.max(0, inv.run.hearts - 1);
+        save();
+        updateHud();
+        renderTools();
+        msg += '（信譽 ❤️ -1，剩 ' + inv.run.hearts + '）';
         fb.textContent = msg;
         fb.hidden = false;
         fb.classList.remove('shake');
         void fb.offsetWidth;
         fb.classList.add('shake');
+        if (inv.run.hearts <= 0) {
+          $('#inv-submit', els.inv).disabled = true;
+          setTimeout(function () {
+            closeLayers();
+            fail('推理錯太多次，偵探信譽值歸零了。', '證據不足就下結論，標本又被貼錯標籤了！先蒐集能區分選項的證據再結案。');
+          }, 1400);
+        }
         return;
       }
       fb.hidden = true;
@@ -1059,6 +1362,7 @@
       if (inv.wrong > 0) s--;
       if (inv.used.length > EFFICIENT_TOOLS) s--;
       s = Math.max(1, s);
+      if (inv.run.retry) s = Math.min(2, s);
       state.solved[inv.id] = { stars: s, tools: inv.used.length };
       save();
       inv.done = true;
@@ -1082,23 +1386,28 @@
       if (!review) {
         notes.push(inv.wrong ? '有修正推理（-1 ⭐）' : '一次就推理成功 ⭐');
         notes.push(inv.used.length <= EFFICIENT_TOOLS ? '只用 ' + inv.used.length + ' 種工具，效率滿分 ⭐' : '用了 ' + inv.used.length + ' 種工具（-1 ⭐）');
+        if (inv.run.retry) notes.push('重試破案最多 2 顆星');
       }
       $('.res-notes', res).textContent = notes.join('・');
       $('#inv-close', els.inv).textContent = review ? '關閉' : '收進案件簿 📒';
     }
 
-    $('#inv-close', els.inv).addEventListener('click', function () {
+    $('#inv-close', els.inv).addEventListener('click', closeInvestigation);
+
+    function closeInvestigation() {
       if (inv.fromBook) { openBook(); return; }
       var finishedNow = inv.scene && sceneSolved(inv.scene) && !state.thinkDone[inv.scene.id];
       closeLayers();
       renderScene();
+      updateHud();
+      if (checkSupply()) return;
       if (finishedNow) {
         toast('🎉 這一區的標本全部破案！阿岩博士有話要說。');
       }
       if (solvedCount() === TOTAL_ROCKS && !state.final) {
         setTimeout(function () { toast('🗺️ 全部標本破案！回地圖挑戰最終案件。'); }, 2800);
       }
-    });
+    }
 
     /* ===== 博士的思考題 ===== */
     function openThink() {
@@ -1259,10 +1568,24 @@
     $('#map-book', game).addEventListener('click', openBook);
     Array.prototype.forEach.call(game.querySelectorAll('[data-close]'), function (b) {
       b.addEventListener('click', function () {
+        if (!els.inv.hidden && inv) { closeInvestigation(); return; }
         if (scene) closeLayers(); else openMap();
       });
     });
     $('#cert-map', game).addEventListener('click', openMap);
+    $('#fail-retry', game).addEventListener('click', retryScene);
+    $('#fail-map', game).addEventListener('click', function () {
+      state.runs[scene.id] = newRun(scene, true);
+      save();
+      openMap();
+    });
+
+    els.practice.checked = !!state.practice;
+    els.practice.addEventListener('change', function () {
+      state.practice = els.practice.checked;
+      save();
+      toast(state.practice ? '🛡️ 練習模式：關閉現場危險（信譽值和工具補給仍然有效）' : '⚠️ 挑戰模式：現場危險開啟！');
+    });
     $('#game-start-btn', game).addEventListener('click', function () {
       els.start.hidden = true;
       if (solvedCount() > 0) { openMap(); return; }
@@ -1280,7 +1603,9 @@
         setTimeout(function () { btn.dataset.confirm = ''; btn.textContent = '重新開始'; }, 4000);
         return;
       }
+      var practice = state.practice;
       state = blank();
+      state.practice = practice;
       save();
       btn.dataset.confirm = '';
       btn.textContent = '重新開始';
