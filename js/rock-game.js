@@ -311,6 +311,20 @@
     }
   ];
 
+  /* ---------- 科學小百科：稀鹽酸測試 ---------- */
+
+  var ACID_INFO = '' +
+    '<p>滴稀鹽酸看冒不冒泡，是在檢查石頭<strong>含不含碳酸鈣</strong>（方解石的主要成分，常來自古代的貝殼、珊瑚）。</p>' +
+    '<p class="info-formula">碳酸鈣 ＋ 鹽酸 → 氯化鈣 ＋ 水 ＋ <strong>二氧化碳（氣泡）</strong></p>' +
+    '<ul class="info-list">' +
+      '<li><span class="fizz-tag strong">劇烈冒泡</span>石灰岩（沉積岩）、大理岩（變質岩）：主要成分就是碳酸鈣</li>' +
+      '<li><span class="fizz-tag weak">微微冒泡</span>磨石子、洗石子、水泥：水泥裡含有鈣的成分</li>' +
+      '<li><span class="fizz-tag none">不冒泡</span>花崗岩、玄武岩、砂岩、頁岩、片岩、片麻岩：主要是石英、長石、雲母，不含碳酸鈣</li>' +
+    '</ul>' +
+    '<p class="info-key">💡 <strong>冒泡只能告訴你「成分」，不能告訴你「家族」！</strong>石灰岩和大理岩都會冒泡，因為大理岩就是石灰岩變質而來，成分一樣。要分辨它們，得再找其他證據：石灰岩常有化石、晶體不明顯；大理岩的化石消失了，晶體閃亮像方糖。</p>' +
+    '<p>🌧️ 生活中的例子：酸雨會慢慢溶蝕大理石雕像；石灰岩洞和鐘乳石，也是微酸的雨水花幾萬年溶解石灰岩形成的。</p>' +
+    '<p class="info-safety">🥽 真的做實驗時：用 5～10% 的稀鹽酸、戴護目鏡、由老師操作。也可以改用比較安全的<strong>白醋</strong>，氣泡較小，要用放大鏡觀察。先刮一點粉末再滴會更明顯，實驗後用清水沖乾淨。</p>';
+
   var FINAL = {
     title: '最終案件：一顆砂粒的時空旅程',
     intro: '博士的筆記只剩最後一頁：一顆石英砂粒，在幾億年裡當過三種岩石。筆記被撕成碎片了，請依照時間順序排好！',
@@ -1544,6 +1558,15 @@
         var li = el('li', 'ev-card' + (fresh === tid ? ' fresh' : ''));
         li.appendChild(el('span', 'ev-tool', t.icon + ' ' + t.name));
         li.appendChild(el('span', 'ev-text', inv.R.ev[tid]));
+        if (tid === 'acid') {
+          var more = el('details', 'ev-more');
+          var sum = el('summary', null, '📖 冒泡代表什麼？');
+          var body = el('div', 'info-body');
+          body.innerHTML = ACID_INFO;
+          more.appendChild(sum);
+          more.appendChild(body);
+          li.appendChild(more);
+        }
         if (!inv.done) {
           var pick = el('button', 'ev-pick', inv.key === tid ? '★ 關鍵證據' : '設為關鍵證據');
           pick.type = 'button';
@@ -1731,6 +1754,9 @@
     });
 
     /* ===== 案件簿 ===== */
+    var bookInfo = $('.book-info .info-body', els.book);
+    if (bookInfo) bookInfo.innerHTML = ACID_INFO;
+
     function openBook() {
       var grid = $('.book-grid', els.book);
       grid.innerHTML = '';
