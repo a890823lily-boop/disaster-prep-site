@@ -1572,3 +1572,32 @@
 .book-info .info-body {
   margin-top: 6px;
 }
+
+/* ===== 地形案件與溪水暴漲 ===== */
+.inv-specimen .buoy.moving {
+  animation: buoy-move var(--dur) linear infinite;
+}
+
+@keyframes buoy-move {
+  from { transform: translate(0, 0); }
+  to { transform: translate(var(--dx), var(--dy)); }
+}
+
+.game-stage .hz-surge {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.game-stage .hz-surge.surge {
+  animation: surge 1.8s ease-out;
+}
+
+@keyframes surge {
+  0% { opacity: 0; transform: translateY(24px); }
+  30% { opacity: 0.85; transform: none; }
+  100% { opacity: 0; transform: none; }
+}
+
+.inv-specimen .sepia {
+  filter: sepia(0.85);
+}
