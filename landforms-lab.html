@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="地形實驗室：土壤沉降瓶、流水侵蝕實驗台、曲流演變、海岸演化與突堤效應，五下自然「大地如何變動」互動模擬器。">
+  <meta name="theme-color" content="#c0392b">
+  <title>地形實驗室｜防災資訊網</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="防災資訊">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/landforms-lab.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要內容</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo" aria-label="防災資訊網 首頁">
+        <span class="logo-mark" aria-hidden="true">⛑</span>
+        <span>防災資訊網</span>
+      </a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="開啟選單">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="site-nav" class="site-nav" aria-label="主選單">
+        <ul>
+          <li><a href="index.html">首頁</a></li>
+          <li><a href="index.html#contacts">緊急電話</a></li>
+          <li><a href="index.html#kit">防災包</a></li>
+          <li><a href="index.html#earthquake">地震應變</a></li>
+          <li><a href="index.html#quiz">情境挑戰</a></li>
+          <li><a href="rocks.html">認識岩石</a></li>
+          <li><a href="rock-game.html">岩石偵探</a></li>
+          <li><a href="landforms-lab.html" class="active" aria-current="page">地形實驗室</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="lab-hero">
+      <div class="container">
+        <p class="eyebrow">五下自然・活動二 大地如何變動</p>
+        <h1>地形實驗室</h1>
+        <p class="lead">先預測，再動手實驗。改變變因、觀察結果、找出規律，看看風化、流水和海浪怎麼一點一點改變大地。</p>
+      </div>
+    </section>
+
+    <section class="section lab-section">
+      <div class="container">
+        <div class="lab-tabs" role="tablist" aria-label="選擇實驗">
+          <button type="button" class="lab-tab" role="tab" data-lab="soil" id="tab-soil" aria-controls="lab-soil"><span class="tab-num">2-1</span>土壤沉降瓶</button>
+          <button type="button" class="lab-tab" role="tab" data-lab="water" id="tab-water" aria-controls="lab-water"><span class="tab-num">2-2</span>流水侵蝕實驗台</button>
+          <button type="button" class="lab-tab" role="tab" data-lab="meander" id="tab-meander" aria-controls="lab-meander"><span class="tab-num">2-3</span>曲流演變</button>
+          <button type="button" class="lab-tab" role="tab" data-lab="coast" id="tab-coast" aria-controls="lab-coast"><span class="tab-num">2-4</span>海岸演化</button>
+        </div>
+
+        <!-- A 土壤沉降瓶 -->
+        <article class="lab-panel" id="lab-soil" role="tabpanel" aria-labelledby="tab-soil" hidden>
+          <header class="lab-head">
+            <h2>土壤沉降瓶</h2>
+            <p>土壤是岩石風化後的碎屑和生物遺骸組成的。把土壤和水裝進瓶子搖一搖，靜置後會發生什麼事？</p>
+          </header>
+          <div class="predict">
+            <strong>🤔 先預測：</strong>搖勻之後，哪一種顆粒會最先沉到瓶底？水會一直混濁嗎？想好了再開始實驗。
+          </div>
+          <div class="lab-body">
+            <div class="lab-stage narrow">
+              <canvas id="soil-canvas" width="300" height="350" role="img" aria-label="土壤沉降瓶模擬：顆粒依大小沉澱分層"></canvas>
+              <p class="lab-status" id="soil-time" aria-live="polite"></p>
+            </div>
+            <div class="lab-controls">
+              <fieldset>
+                <legend>選擇土壤樣本</legend>
+                <label><input type="radio" name="soil-sample" value="garden" checked> 🌼 花圃土</label>
+                <label><input type="radio" name="soil-sample" value="river"> 🏞️ 河邊砂土</label>
+                <label><input type="radio" name="soil-sample" value="paddy"> 🌾 稻田黏土</label>
+              </fieldset>
+              <label class="field">時間加速
+                <select id="soil-speed">
+                  <option value="5">× 5</option>
+                  <option value="20" selected>× 20</option>
+                  <option value="80">× 80（看黏土沉澱）</option>
+                </select>
+              </label>
+              <button type="button" class="btn btn-primary btn-lg" id="soil-shake">🫙 搖一搖</button>
+              <button type="button" class="btn btn-outline" id="soil-reveal">顯示分層與組成</button>
+              <div class="lab-result" id="soil-result" hidden></div>
+            </div>
+          </div>
+          <details class="think">
+            <summary>🧠 挑戰題</summary>
+            <ol>
+              <li>三種土壤沉澱後，各層的厚度有什麼不同？哪一種最適合種菜？為什麼？
+                <button type="button" class="think-reveal">看參考答案</button>
+                <p class="answer" hidden>花圃土的砂、粉砂、黏土比例較平均，又有腐植質，排水和保水都不錯，最適合種菜。河邊砂土砂太多、留不住水和養分；稻田黏土黏土太多、透氣和排水差，但很適合需要淹水的水稻。</p></li>
+              <li>月球表面有一層細細的「月壤」，它和地球的土壤最大的不同是什麼？
+                <button type="button" class="think-reveal">看參考答案</button>
+                <p class="answer" hidden>月壤是隕石撞擊和溫差讓岩石碎裂形成的，但月球沒有生物，所以沒有腐植質；也沒有水和空氣造成的化學風化。地球的土壤是「岩石碎屑＋生物遺骸」，月壤只有岩石碎屑。</p></li>
+              <li>大雨後河水常常變得混濁好幾天，和這個實驗有什麼關係？
+                <button type="button" class="think-reveal">看參考答案</button>
+                <p class="answer" hidden>河水裡懸浮著很細的黏土和粉砂，它們沉得非常慢，所以河水會混濁很久。水流越慢的地方（例如河口、水庫），細顆粒才會慢慢沉積下來，這也是水庫淤積的原因。</p></li>
+            </ol>
+          </details>
+        </article>
+
+        <!-- B 流水侵蝕實驗台 -->
+        <article class="lab-panel" id="lab-water" role="tabpanel" aria-labelledby="tab-water" hidden>
+          <header class="lab-head">
+            <h2>流水侵蝕實驗台</h2>
+            <p>課本改變了「坡度」。真正的科學家還會測試哪些變因？調整設定、澆水，比較沖下來的泥沙量和溝的深度。</p>
+          </header>
+          <div class="predict">
+            <strong>🔬 公平測試：</strong>想知道某個變因的影響，<em>一次只改變一個變因</em>，其他保持不變。表格會幫你檢查！
+          </div>
+          <div class="lab-stage wide">
+            <canvas id="water-canvas" width="640" height="300" role="img" aria-label="流水侵蝕實驗台：水從土堆上方流下，侵蝕坡面並在盤中堆積"></canvas>
+          </div>
+          <div class="water-controls">
+            <label class="field">坡度：<strong id="w-slope-val">中</strong>
+              <input type="range" id="w-slope" min="1" max="3" step="1" value="2">
+            </label>
+            <label class="field">水量：<strong id="w-flow-val">中</strong>
+              <input type="range" id="w-flow" min="1" max="3" step="1" value="2">
+            </label>
+            <label class="check"><input type="checkbox" id="w-veg"> 🌱 坡面種草</label>
+            <label class="check"><input type="checkbox" id="w-coarse"> 🪨 粗礫比較多</label>
+            <button type="button" class="btn btn-primary btn-lg" id="w-run">💧 開始澆水</button>
+            <button type="button" class="btn btn-outline" id="w-reset">重設土堆</button>
+          </div>
+          <p class="lab-status" id="w-status" aria-live="polite"></p>
+          <div class="table-wrap">
+            <table class="trials" id="w-trials">
+              <caption>實驗紀錄表</caption>
+              <thead><tr><th>次</th><th>坡度</th><th>水量</th><th>地表</th><th>顆粒</th><th>沖下的泥沙</th><th>溝深（cm）</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <button type="button" class="link-btn" id="w-clear">清除紀錄</button>
+          <details class="think">
+            <summary>🧠 挑戰題</summary>
+            <ol>
+              <li>根據你的紀錄，哪個變因對「沖下的泥沙量」影響最大？你的證據是哪兩次試驗？
+                <button type="button" class="think-reveal">看參考答案</button>
+                <p class="answer" hidden>答案要引用「只差一個變因」的兩次試驗來比較。通常坡度和植被的影響最明顯：坡度越陡、流速越快，侵蝕和搬運越強；有植物時根會抓住土壤、葉子減緩水流，泥沙量大幅減少。</p></li>
+              <li>為什麼山坡地開發後常發生土石流？從實驗結果提出一個防災建議。
+                <button type="button" class="think-reveal">看參考答案</button>
+                <p class="answer" hidden>開發時砍掉植物，等於把「種草」改成「裸露」，坡面更容易被侵蝕；豪雨又等於「水量大」。建議：保留或種植植物（水土保持）、做好排水、避免在陡坡開發。</p></li>
+              <li>粗礫多的土堆為什麼比較不容易被沖走？這和河流上游為什麼有很多大石頭有什麼關係？
+                <button type="button" class="think-reveal">看參考答案</button>
+                <p class="answer" hidden>顆粒越大越重，需要越快的水流才搬得動。上游坡陡、流速快，細顆粒都被帶走，只留下大石頭；到了下游流速變慢，連小顆粒也會沉積下來。</p></li>
+            </ol>
+          </details>
+        </article>
+
+        <!-- C 曲流演變 -->
+        <article class="lab-panel" id="lab-meander" role="tabpanel" aria-labelledby="tab-meander" hidden>
+          <header class="lab-head">
+            <h2>曲流演變</h2>
+            <p>河流在平坦的下游常常彎來彎去。播放時間，觀察凹岸和凸岸怎麼變化，河道最後會發生什麼事？</p>
+          </header>
+          <div class="predict">
+            <strong>🤔 先預測：</strong>彎曲的河道會慢慢變直，還是越來越彎？如果越來越彎，最後會怎樣？
+          </div>
+          <div class="lab-stage wide">
+            <canvas id="meander-canvas" width="640" height="360" role="img" aria-label="曲流演變模擬：河道凹岸侵蝕、凸岸堆積，彎曲過度時截彎形成牛軛湖"></canvas>
+            <p class="lab-toast" id="m-msg" role="status" hidden></p>
+          </div>
+          <div class="meander-controls">
+            <button type="button" class="btn btn-primary btn-lg" id="m-play">▶ 播放</button>
+            <label class="field">速度 <input type="range" id="m-speed" min="1" max="6" value="2"></label>
+            <label class="check"><input type="checkbox" id="m-labels" checked> 標示凹岸／凸岸</label>
+            <button type="button" class="btn btn-outline" id="m-cut">🏗️ 人工截彎取直</button>
+            <button type="button" class="btn btn-outline" id="m-reset">重新開始</button>
+          </div>
+          <p class="lab-stats">經過約 <strong id="m-years">0</strong> 年・截彎 <strong id="m-oxbows">0</strong> 次</p>
+          <p class="legend"><span class="sw" style="background:#3f8fd0"></span>河道 <span class="sw" style="background:#e8d3a0"></span>凸岸沙洲（堆積） <span class="sw" style="background:#7aa7c9"></span>牛軛湖 <span class="sw" style="background:#8fb87a"></span>舊河道痕跡</p>
+          <details class="think">
+            <summary>🧠 挑戰題</summary>
+            <ol>
+              <li>如果要在河邊蓋房子，你會選凹岸還是凸岸？為什麼？
+                <button type="button" class="think-reveal">看參考答案</button>
+                <p class="answer" hidden>凸岸。凹岸水流快、不斷被侵蝕，河岸會一直後退，房子可能被掏空；凸岸水流慢、泥沙堆積，地面反而會增加。但河道會移動，長期來看都要注意洪水風險。</p></li>
+              <li>牛軛湖為什麼會隨著時間慢慢消失？
+                <button type="button" class="think-reveal">看參考答案</button>
+                <p class="answer" hidden>牛軛湖和河道分開後，沒有水流帶走泥沙，洪水時帶來的泥沙和湖中的植物遺骸慢慢堆積，湖越來越淺，最後變成沼澤、再變成陸地。</p></li>
+              <li>基隆河曾經「截彎取直」來減少淹水。截彎取直有什麼好處和壞處？
+                <button type="button" class="think-reveal">看參考答案</button>
+                <p class="answer" hidden>好處：河道變短，洪水能更快流走，減少淹水，也多出可利用的土地。壞處：流速變快，下游侵蝕和洪峰可能增加；原本的濕地、生物棲地消失；河流仍會想恢復彎曲，需要長期維護堤防。</p></li>
+            </ol>
+          </details>
+        </article>
+
+        <!-- D 海岸演化 -->
+        <article class="lab-panel" id="lab-coast" role="tabpanel" aria-labelledby="tab-coast" hidden>
+          <header class="lab-head">
+            <h2>海岸演化</h2>
+            <p>海蝕洞、海蝕門、海蝕柱其實是同一個岬角在不同時間的樣子。拖動時間軸，把課本裡的照片排出順序！</p>
+          </header>
+          <div class="coast-subtabs" role="tablist" aria-label="海岸實驗">
+            <button type="button" class="coast-subtab" data-sub="erosion" aria-selected="true">🌊 海蝕地形演化</button>
+            <button type="button" class="coast-subtab" data-sub="jetty" aria-selected="false">🧱 突堤效應</button>
+          </div>
+
+          <div id="coast-erosion">
+            <div class="predict">
+              <strong>🤔 先預測：</strong>金山的燭臺雙嶼現在是「海蝕柱」，再過幾千年，它可能變成什麼樣子？
+            </div>
+            <div class="lab-stage wide">
+              <svg id="c-svg" viewBox="0 0 640 300" role="img" aria-label="岬角受海浪侵蝕的演化過程"></svg>
+            </div>
+            <div class="coast-controls">
+              <label class="field slider-field">時間：<strong id="c-years">現在</strong>
+                <input type="range" id="c-stage" min="0" max="5" step="1" value="0" aria-label="時間">
+              </label>
+              <fieldset class="inline">
+                <legend>岩石</legend>
+                <label><input type="radio" name="c-rock" value="soft" checked> 較軟（砂岩）</label>
+                <label><input type="radio" name="c-rock" value="hard"> 較硬（安山岩）</label>
+              </fieldset>
+            </div>
+            <div class="stage-card">
+              <h3 id="c-name"></h3>
+              <p id="c-desc"></p>
+              <p class="stage-ex" id="c-ex"></p>
+            </div>
+          </div>
+
+          <div id="coast-jetty" hidden>
+            <div class="predict">
+              <strong>🤔 先預測：</strong>在海邊蓋一道伸進海裡的突堤，突堤左右兩邊的沙灘會怎麼變化？
+            </div>
+            <div class="lab-stage wide">
+              <svg id="j-svg" viewBox="0 0 640 300" role="img" aria-label="突堤效應：上游堆積、下游侵蝕"></svg>
+            </div>
+            <div class="coast-controls">
+              <label class="check"><input type="checkbox" id="c-jetty"> 🧱 建造突堤</label>
+              <label class="field slider-field">時間：<strong id="c-time-val">剛建好</strong>
+                <input type="range" id="c-time" min="0" max="10" step="1" value="0" aria-label="建好後經過的時間">
+              </label>
+            </div>
+            <p class="lab-status" id="j-note" aria-live="polite"></p>
+          </div>
+
+          <details class="think">
+            <summary>🧠 挑戰題</summary>
+            <ol>
+              <li>同一個岬角，為什麼有的地方先被挖成海蝕洞，有的地方卻沒有？
+                <button type="button" class="think-reveal">看參考答案</button>
+                <p class="answer" hidden>岩石有裂縫（節理）或比較軟的地方，抵抗力弱，海浪會優先從那裡侵蝕。這叫「差異侵蝕」，野柳的豆腐岩、女王頭也是這樣形成的。</p></li>
+              <li>硬的岩石和軟的岩石，哪一種海岸會形成「岬角」？哪一種會形成「海灣」？
+                <button type="button" class="think-reveal">看參考答案</button>
+                <p class="answer" hidden>硬岩抵抗侵蝕，凸出成為岬角；軟岩被侵蝕得快，凹進去成為海灣。海浪在岬角集中侵蝕、在海灣比較平緩，沙子堆積成沙灘，形成台灣北部常見的「岬灣海岸」。</p></li>
+              <li>為了保護海岸而蓋的突堤或消波塊，可能帶來什麼新問題？你會怎麼取捨？
+                <button type="button" class="think-reveal">看參考答案</button>
+                <p class="answer" hidden>突堤會攔住沿岸流帶來的沙子，造成下游海岸缺沙、後退（突堤效應）；消波塊也會改變海浪和沙子的移動，並影響景觀與生態。取捨時要考慮整段海岸，而不是只保護一個點，也可以用「養灘」（補沙）等方法。</p></li>
+            </ol>
+          </details>
+        </article>
+
+        <p class="lab-links"><a href="rocks.html">🪨 認識岩石</a>・<a href="rock-game.html">🕵️ 岩石偵探遊戲</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>本站資訊僅供參考，實際應變請依政府單位最新公告為準。</p>
+      <p><a href="#main">回到頂端 ↑</a></p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/landforms-lab.js"></script>
+</body>
+</html>
