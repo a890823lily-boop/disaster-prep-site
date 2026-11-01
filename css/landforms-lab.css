@@ -546,3 +546,27 @@ canvas.shaking {
     animation: none;
   }
 }
+
+.lab-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lab-jump a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+}
+
+.lab-jump a:hover {
+  border-color: var(--primary);
+}
