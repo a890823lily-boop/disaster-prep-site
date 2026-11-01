@@ -248,7 +248,7 @@ h1, h2, h3 {
 
 @media (min-width: 900px) {
   .quick-links {
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
   .quick-links .quick-card:last-child:nth-child(odd) {
     grid-column: auto;
