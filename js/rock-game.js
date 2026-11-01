@@ -30,7 +30,10 @@
     igneous: { name: '火成岩', color: '#d9480f', hint: '看得到交錯的晶體或氣孔、不分層、不會冒泡，通常和岩漿冷卻有關。' },
     sedimentary: { name: '沉積岩', color: '#a16207', hint: '有分層、顆粒是砂或礫石、或含有化石，通常是一層層堆積形成的。' },
     metamorphic: { name: '變質岩', color: '#7c3aed', hint: '有條紋、片狀，或晶體閃亮又排成同一方向，代表受過高溫高壓。' },
-    artificial: { name: '人造石材', color: '#475569', hint: '注意有沒有水泥、筆直的人工線條，以及大小太過平均的石粒。' }
+    artificial: { name: '人造石材', color: '#475569', hint: '注意有沒有水泥、筆直的人工線條，以及大小太過平均的石粒。' },
+    weathering: { name: '風化', color: '#b45309', hint: '先確認水流或海浪有沒有直接作用。水碰不到的地方，可能是溫差、鹽結晶或生物造成的風化。' },
+    erosion: { name: '侵蝕', color: '#b91c1c', hint: '水流或海浪很強、地形被挖深、河岸或崖壁後退，都是侵蝕的證據。' },
+    deposition: { name: '堆積', color: '#a16207', hint: '水流或浪變弱、有泥沙堆積、地形越長越大，都是堆積的證據。' }
   };
   var FAMILY_ORDER = ['igneous', 'sedimentary', 'metamorphic', 'artificial'];
 
@@ -217,6 +220,223 @@
     }
   };
 
+  /* ---------- 地形案件（溪流探險、岬灣海岸） ---------- */
+
+  var LAND_FAMILY_ORDER = ['weathering', 'erosion', 'deposition'];
+
+  var LAND_TOOLS = [
+    { id: 'scope', icon: '🔭', name: '望遠鏡', desc: '觀察整體形狀' },
+    { id: 'float', icon: '🎈', name: '放浮標', desc: '測水流或浪的強弱' },
+    { id: 'sieve', icon: '🧺', name: '採樣篩', desc: '看堆積物大小、圓度' },
+    { id: 'photo', icon: '📷', name: '老照片', desc: '比較過去和現在' }
+  ];
+
+  function toolsFor(R) { return R.kind === 'land' ? LAND_TOOLS : TOOLS; }
+  function toolById(id) { return TOOLS.concat(LAND_TOOLS).filter(function (t) { return t.id === id; })[0]; }
+
+  // 地形插圖（320×150），past=true 時畫出老照片中的樣子
+  var LANDVIEW = {
+    vvalley: function (past) {
+      var b = past ? 112 : 128;
+      return '<rect width="320" height="150" fill="#cfe8f7"/>' +
+        '<path d="M0 18 L146 ' + b + ' L174 ' + b + ' L320 18 V150 H0 Z" fill="#7d8a6a"/>' +
+        '<path d="M60 70 L90 64 M230 64 L262 72 M40 40 L70 50" stroke="#5f6b4f" stroke-width="2"/>' +
+        '<path d="M146 ' + b + ' Q160 ' + (b + 10) + ' 174 ' + b + '" stroke="#4b9bcc" stroke-width="6" fill="none"/>' +
+        '<path d="M140 ' + (b + 6) + ' l8 -8 l9 4 l-2 8 z M170 ' + (b + 8) + ' l6 -9 l8 6 l-4 6 z" fill="#8a7a6a" stroke="#4b3f33"/>';
+    },
+    exfol: function (past) {
+      return '<rect width="320" height="150" fill="#fdf6e3"/><rect y="112" width="320" height="38" fill="#c8a97e"/>' +
+        '<path d="M250 150 Q270 136 320 134 V150 Z" fill="#4b9bcc"/>' +
+        '<ellipse cx="140" cy="84" rx="78" ry="40" fill="#b9a27f"/>' +
+        '<path d="M70 82 Q140 30 210 82 M84 84 Q140 46 196 84" stroke="#8a7458" stroke-width="2" fill="none"/>' +
+        (past ? '' : '<path d="M66 80 Q140 34 214 80 L208 70 Q140 26 72 70 Z" fill="#d6c3a2" stroke="#7a6248" transform="translate(6 -6) rotate(-4 140 60)"/>' +
+          '<path d="M60 118 q10 -6 20 0 M206 120 q8 -6 18 0 M100 122 q8 -5 16 0" stroke="#8a7458" stroke-width="3" fill="none"/>');
+    },
+    fan: function (past) {
+      var r = past ? 70 : 100;
+      return '<rect width="320" height="150" fill="#cfe8f7"/><path d="M0 50 L80 10 L130 40 L190 6 L320 40 V150 H0 Z" fill="#a9d18e"/>' +
+        '<path d="M110 20 L130 40 L150 22" fill="#7d8a6a"/>' +
+        '<path d="M130 40 L' + (130 - r * 0.9) + ' ' + (40 + r) + ' Q130 ' + (40 + r * 1.15) + ' ' + (130 + r * 0.9) + ' ' + (40 + r) + ' Z" fill="#d4b07a"/>' +
+        '<path d="M130 40 Q120 80 100 ' + (40 + r) + ' M130 40 Q134 90 130 ' + (40 + r) + ' M130 40 Q150 80 168 ' + (40 + r * 0.95) + '" stroke="#4b9bcc" stroke-width="2.5" fill="none"/>';
+    },
+    cutbank: function (past) {
+      var bulge = past ? 40 : 66;
+      return '<rect width="320" height="150" fill="#a9d18e"/>' +
+        '<path d="M0 40 Q' + (150 + bulge) + ' 20 ' + (170 + bulge) + ' 75 Q' + (150 + bulge) + ' 130 0 110" stroke="#4b9bcc" stroke-width="24" fill="none"/>' +
+        '<path d="M' + (182 + bulge) + ' 40 Q' + (196 + bulge) + ' 75 ' + (182 + bulge) + ' 112" stroke="#7a5233" stroke-width="5" fill="none"/>' +
+        '<path d="M' + (186 + bulge) + ' 60 l8 -3 M' + (188 + bulge) + ' 80 l9 1 M' + (186 + bulge) + ' 98 l8 3" stroke="#5b4636" stroke-width="1.5"/>' +
+        '<path d="M60 64 Q' + (110 + bulge * 0.5) + ' 66 ' + (110 + bulge * 0.6) + ' 75 Q' + (110 + bulge * 0.5) + ' 84 60 86 Z" fill="#e8d3a0"/>' +
+        '<text x="' + (230 + bulge * 0.4) + '" y="20" text-anchor="middle" font-size="10" font-weight="800" fill="#1f2933">↓ 這一側</text>';
+    },
+    delta: function (past) {
+      var s = past ? 0.6 : 1;
+      return '<rect width="320" height="150" fill="#4b9bcc"/><path d="M0 0 H130 L110 150 H0 Z" fill="#a9d18e"/>' +
+        '<path d="M110 75 L' + (110 + 120 * s) + ' ' + (75 - 60 * s) + ' Q' + (110 + 150 * s) + ' 75 ' + (110 + 120 * s) + ' ' + (75 + 60 * s) + ' Z" fill="#e8d3a0"/>' +
+        '<path d="M0 75 H110 M110 75 L' + (110 + 110 * s) + ' ' + (75 - 40 * s) + ' M110 75 L' + (110 + 130 * s) + ' 75 M110 75 L' + (110 + 110 * s) + ' ' + (75 + 40 * s) + '" stroke="#3f8fd0" stroke-width="5" fill="none"/>';
+    },
+    beach: function () {
+      return '<rect width="320" height="150" fill="#4b9bcc"/>' +
+        '<path d="M0 150 V40 L50 30 L80 100 Q160 126 240 100 L270 30 L320 40 V150 Z" fill="#a9d18e"/>' +
+        '<path d="M80 100 Q160 126 240 100 L236 112 Q160 140 84 112 Z" fill="#e8d6a8"/>' +
+        '<path d="M100 96 q12 -4 24 0 t24 0 t24 0 t24 0" stroke="#e0f2fe" stroke-width="2" fill="none"/>' +
+        '<path d="M44 34 q8 -6 16 0 M262 34 q8 -6 16 0" stroke="#fff" stroke-width="3" fill="none"/>';
+    },
+    seastack: function (past) {
+      var out = '<rect width="320" height="150" fill="#cfe8f7"/><rect y="118" width="320" height="32" fill="#4b9bcc"/>' +
+        '<path d="M0 40 L90 40 L100 118 L0 118 Z" fill="#a98a66"/>';
+      if (past) out += '<path d="M90 40 L270 46 L282 118 L96 118 Z" fill="#b08f6a"/><path d="M150 118 Q150 70 184 68 Q218 70 218 118 Z" fill="#cfe8f7"/>';
+      else out += '<path d="M90 40 L130 42 L138 118 L96 118 Z" fill="#b08f6a"/><path d="M220 56 L262 58 L272 118 L214 118 Z" fill="#b08f6a"/>' +
+        '<path d="M160 118 l10 -8 l12 4 l6 4 z M190 118 l8 -6 l10 6 z" fill="#8f7a5f"/>';
+      return out + '<path d="M0 124 q10 -4 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0" stroke="#e0f2fe" stroke-width="2" fill="none"/>';
+    },
+    tofu: function (past) {
+      var gap = past ? 2 : 5, out = '<rect width="320" height="150" fill="#cfe8f7"/><rect y="40" width="320" height="110" fill="#5b6672"/>';
+      for (var r = 0; r < 4; r++) {
+        for (var c = 0; c < 8; c++) {
+          out += '<rect x="' + (10 + c * 38 + gap / 2) + '" y="' + (46 + r * 26 + gap / 2) + '" width="' + (38 - gap) + '" height="' + (26 - gap) + '" fill="#a08b6e" stroke="#7a6a52"/>';
+        }
+      }
+      return out;
+    },
+    honeycomb: function (past) {
+      var out = '<rect width="320" height="150" fill="#cfe8f7"/><rect y="118" width="320" height="32" fill="#c8a97e"/>' +
+        '<path d="M50 118 Q40 60 100 40 Q180 24 240 50 Q290 76 270 118 Z" fill="#d4b07a"/>';
+      var n = past ? 12 : 30;
+      for (var i = 0; i < n; i++) {
+        var x = 80 + (i * 53) % 170, y = 56 + (i * 29) % 54, r = past ? 2.5 + (i % 3) : 3.5 + (i % 4) * 1.4;
+        out += '<ellipse cx="' + x + '" cy="' + y + '" rx="' + r + '" ry="' + (r * 0.8) + '" fill="#8a6a3f" stroke="#f1dcb4" stroke-width=".8"/>';
+      }
+      return out;
+    }
+  };
+
+  var LAND_CASES = {
+    vvalley: {
+      kind: 'land', name: 'V 形谷', family: 'erosion', icon: '⛰️',
+      options: ['V 形谷', '沖積扇', '三角洲'], flow: 'fast', floatPath: [150, 120, 290, 128], grain: 'boulder',
+      ev: {
+        scope: '兩側山壁又陡又高，河谷又深又窄，像英文字母 V。',
+        float: '浮標一下就被沖走了，水流非常湍急。',
+        sieve: '幾乎沒有細沙，只有稜角分明的大石頭。',
+        photo: '比較 50 年前的照片，河床又往下切深了一些。'
+      },
+      key: ['scope', 'photo'],
+      nameHint: '沖積扇和三角洲都是泥沙堆出來的平緩地形，這裡卻又深又陡。',
+      explain: '上游坡陡水急，河水不斷往下侵蝕（下切），切出又深又窄的 V 形谷。細顆粒都被急流沖走，只剩下大石頭。'
+    },
+    exfol: {
+      kind: 'land', name: '洋蔥狀剝落', family: 'weathering', icon: '🧅',
+      options: ['洋蔥狀剝落', '海蝕洞', '鵝卵石'], flow: 'none', floatPath: [280, 142, 300, 142], grain: 'flakes',
+      ev: {
+        scope: '一顆巨大的岩石，表面像洋蔥一樣，一層層翹起、剝落。',
+        float: '浮標只能放在遠處的溪水裡。這顆石頭在高處，水根本碰不到它。',
+        sieve: '石頭旁邊散落一片片薄薄的岩片，彎曲的形狀和石頭表面一樣。',
+        photo: '老照片裡外層還很完整，現在已經剝落了一層。'
+      },
+      key: ['float', 'scope'],
+      nameHint: '海蝕洞是海浪打出來的洞，鵝卵石是被水磨圓的石頭。這顆石頭水碰不到，表面一層層剝落。',
+      explain: '這顆石頭碰不到水，所以不是流水侵蝕！白天受熱膨脹、晚上冷卻收縮，表層一層層剝落，是物理風化（課本 2-1）。'
+    },
+    fan: {
+      kind: 'land', name: '沖積扇', family: 'deposition', icon: '🪭',
+      options: ['沖積扇', '三角洲', 'V 形谷'], flow: 'slow', floatPath: [130, 50, 120, 120], grain: 'gradient',
+      ev: {
+        scope: '在山谷的出口，泥沙堆成像打開的扇子一樣的形狀。',
+        float: '水流到這裡突然變慢，分成好幾條小溪往外流。',
+        sieve: '靠近山谷口是粗礫石，越往外顆粒越細。',
+        photo: '老照片裡扇形的範圍比較小，現在越堆越大了。'
+      },
+      key: ['scope', 'sieve'],
+      nameHint: '三角洲在河流出海的地方；這裡是在山谷的出口，而且顆粒比較粗。',
+      explain: '河流流出山谷，坡度突然變緩、水流變慢，帶來的泥沙堆成扇形。大顆的先沉在扇頂，細的被帶到扇緣，這叫分選作用。'
+    },
+    cutbank: {
+      kind: 'land', name: '曲流凹岸', family: 'erosion', icon: '↪️',
+      options: ['曲流凹岸', '曲流凸岸', '沖積扇'], flow: 'fast', floatPath: [60, 40, 220, 72], grain: 'roots',
+      ev: {
+        scope: '河道在這裡大轉彎。這一側的河岸又陡又直，像被挖掉了一塊。',
+        float: '浮標被沖向這一側的河岸，速度很快。',
+        sieve: '岸邊沒有沙子堆積，只看到被沖刷露出來的樹根。',
+        photo: '比較老照片，這一側的河岸每年都往外退了好幾公尺。'
+      },
+      key: ['float', 'photo', 'sieve'],
+      nameHint: '凸岸在彎道內側，水流慢、會堆積沙洲；這一側水流快、河岸一直後退。',
+      explain: '彎道外側的凹岸水流快，不斷侵蝕河岸，河岸後退、變陡；內側的凸岸水流慢，泥沙堆積成沙洲。'
+    },
+    delta: {
+      kind: 'land', name: '三角洲', family: 'deposition', icon: '🔺',
+      options: ['三角洲', '沖積扇', '海蝕平臺'], flow: 'slow', floatPath: [20, 75, 200, 75], grain: 'mud',
+      ev: {
+        scope: '河流出海的地方，堆出一片三角形的低平陸地，河道分成好幾條。',
+        float: '河水流進大海後幾乎停住，水變得很混濁。',
+        sieve: '全是很細的泥和沙，摸起來滑滑的。',
+        photo: '老照片中的陸地比較小，現在一年一年往海裡延伸。'
+      },
+      key: ['scope', 'sieve', 'photo'],
+      nameHint: '沖積扇在山谷出口、顆粒比較粗；海蝕平臺是岩石被海浪磨平的。這裡在河口，顆粒很細。',
+      explain: '河流到了出海口，水流幾乎停止，最細的泥沙沉積下來，形成三角洲。台灣河流泥沙多，但海浪強，泥沙常被推成沙洲。'
+    },
+    beach: {
+      kind: 'land', name: '沙灘', family: 'deposition', icon: '🏖️',
+      options: ['沙灘', '海蝕平臺', '豆腐岩'], flow: 'slow', floatPath: [160, 90, 160, 108], grain: 'sand',
+      ev: {
+        scope: '位在兩個岬角中間的海灣裡，是一大片平緩的沙。',
+        float: '海灣裡的浪比較小，浪花輕輕把浮標推上岸。',
+        sieve: '細細的沙粒，大小差不多，還有一些貝殼碎片。',
+        photo: '老照片裡沙灘的範圍差不多，夏天大一點、冬天小一點。'
+      },
+      key: ['float', 'scope', 'sieve'],
+      nameHint: '海蝕平臺和豆腐岩都是岩石被侵蝕形成的，這裡卻是一大片沙。',
+      explain: '硬的岩石凸出成岬角，浪的能量集中打在岬角；海灣裡浪小，沙子堆積成沙灘，形成「岬灣海岸」。'
+    },
+    seastack: {
+      kind: 'land', name: '海蝕柱', family: 'erosion', icon: '🗿',
+      options: ['海蝕柱', '海蝕門', '海蝕洞'], flow: 'fast', floatPath: [300, 126, 230, 120], grain: 'blocks',
+      ev: {
+        scope: '一根孤立的岩柱站在海裡，已經和陸地分開了。',
+        float: '浪很大，不斷拍打岩柱的底部。',
+        sieve: '岩柱附近的海底有很多大石塊，像是從上方崩落下來的。',
+        photo: '100 年前的老照片裡，這裡竟然是一座拱門！'
+      },
+      key: ['photo', 'scope'],
+      nameHint: '海蝕門中間有洞、兩端還連在一起；海蝕洞是崖壁上的洞。這根岩柱已經孤立了。',
+      explain: '海浪先挖出海蝕洞，兩側打通成海蝕門，拱頂崩落後剩下孤立的海蝕柱。老照片就是演化順序最好的證據！'
+    },
+    honeycomb: {
+      kind: 'land', name: '蜂窩岩', family: 'weathering', icon: '🐝',
+      options: ['蜂窩岩', '豆腐岩', '海蝕洞'], flow: 'none', floatPath: [300, 138, 310, 138], grain: 'salt',
+      ev: {
+        scope: '岩石表面布滿一個個小圓洞，像蜂窩一樣。',
+        float: '這塊岩石在高處，平常浪打不到，只有強風吹來的浪花水沫。',
+        sieve: '小洞裡面有亮晶晶的白色鹽結晶。',
+        photo: '老照片裡的洞比較小、也比較少。'
+      },
+      key: ['sieve', 'float'],
+      nameHint: '豆腐岩是直線切成的方格；海蝕洞是浪打出來的大洞。這些小洞裡有鹽結晶……',
+      explain: '浪花把海水濺到岩石上，水分蒸發後，鹽在小孔裡結晶，把岩石撐碎，洞越來越大，形成蜂窩岩。這是鹽造成的物理風化（課本 2-1）！'
+    },
+    tofu: {
+      kind: 'land', name: '豆腐岩', family: 'erosion', icon: '🧈',
+      options: ['豆腐岩', '蜂窩岩', '沙灘'], flow: 'fast', floatPath: [40, 72, 300, 72], grain: 'gravel',
+      ev: {
+        scope: '海蝕平臺上的岩石，被切成一塊塊方方正正的格子。',
+        float: '漲潮時海水灌進格子間的縫隙，退潮時又快速流出來。',
+        sieve: '縫隙裡卡著小石子和沙，被海水來回沖刷。',
+        photo: '和老照片比，格子間的縫隙越來越寬、越來越深。'
+      },
+      key: ['scope', 'float', 'photo'],
+      nameHint: '蜂窩岩是一個個小圓洞，豆腐岩是直線切出的方格。',
+      explain: '岩石原本就有兩組交叉的節理（裂縫），海水沿著節理反覆侵蝕，把岩石切成像豆腐一樣的方塊。'
+    }
+  };
+
+  Object.keys(LAND_CASES).forEach(function (k) {
+    LAND_CASES[k].view = LANDVIEW[k];
+    ROCKS[k] = LAND_CASES[k];
+  });
+
+  function isRockCase(id) { return ROCKS[id].kind !== 'land'; }
+
   /* ---------- 場景 ---------- */
 
   var SCENES = [
@@ -308,6 +528,53 @@
         answer: 0,
         explain: '天然岩石也可能有很多顏色、也很硬，所以那兩個證據分不出來。水泥和筆直的人工線條，才是人造石材獨有的證據。'
       }
+    },
+    {
+      id: 'river', name: '溪流探險', place: '從山谷到出海口', width: 760, pin: [230, 96],
+      intro: [
+        '這條溪從高山一路流到大海。上游、中游、下游的地形都不一樣，它們是怎麼形成的？',
+        '這一區調查的不是岩石，而是「地形」！工具換成望遠鏡、浮標、採樣篩和老照片。要判斷是侵蝕、堆積，還是風化造成的。',
+        '⚠️ 注意：上游下大雨時溪水會暴漲！聽到警報，要馬上跑到高處的避難平臺。'
+      ],
+      hazard: { type: 'flood', shelters: [[150, 190, '高處平臺'], [395, 435, '堤防樓梯'], [560, 600, '高灘地']], every: [11, 15], warn: 4.5 },
+      event: { type: 'rain' },
+      rocks: [
+        { id: 'vvalley', x: 100 },
+        { id: 'exfol', x: 225 },
+        { id: 'fan', x: 330 },
+        { id: 'cutbank', x: 485, hidden: 'bush' },
+        { id: 'delta', x: 680 }
+      ],
+      npcX: 625,
+      think: {
+        q: '颱風過後，台灣的河水常常變得非常混濁，河床也常常改道。為什麼？',
+        options: ['河流短而急、雨量大，大量泥沙被沖刷、搬運，堆積後改變了河道', '工廠排放了大量污水', '河水被太陽曬熱了'],
+        answer: 0,
+        explain: '颱風帶來豪雨，水量大、流速快，侵蝕和搬運都變強，河水挾帶大量泥沙；水流變慢時泥沙堆積，就可能堵住舊河道、讓河流改道。'
+      }
+    },
+    {
+      id: 'cape', name: '岬灣海岸', place: '東北角・鼻頭角', width: 700, pin: [228, 48],
+      intro: [
+        '東北角的海岸，岬角和海灣一個接著一個。有的地方被海浪侵蝕，有的地方在堆積。',
+        '小心！這裡有一個案件是「風化」造成的，不是海浪。要找出決定性的證據。',
+        '⚠️ 潮水正在上漲，海蝕平臺上的案件要在淹沒前完成！看到瘋狗浪要遠離岸邊。'
+      ],
+      hazard: { type: 'tide', duration: 240, flood: 500 },
+      event: { type: 'wave', safeX: 380 },
+      rocks: [
+        { id: 'beach', x: 110 },
+        { id: 'seastack', x: 300 },
+        { id: 'honeycomb', x: 425 },
+        { id: 'tofu', x: 580 }
+      ],
+      npcX: 200,
+      think: {
+        q: '岬灣海岸的「岬角」會越來越短，「海灣」裡的沙灘卻能保留下來。為什麼？',
+        options: ['浪的能量集中打在岬角，海灣裡浪小、沙子容易堆積', '海灣的沙子都是人搬來的', '岬角的岩石最軟'],
+        answer: 0,
+        explain: '海浪靠近岸邊時會轉向，能量集中在凸出的岬角，所以岬角被侵蝕、慢慢後退；海灣裡的浪分散變弱，沙子就堆積成沙灘。'
+      }
     }
   ];
 
@@ -340,6 +607,7 @@
   };
 
   var TOTAL_ROCKS = Object.keys(ROCKS).length;
+  var ROCK_IDS = Object.keys(ROCKS).filter(function (k) { return ROCKS[k].kind !== 'land'; });
   var MAX_STARS = TOTAL_ROCKS * 3 + SCENES.length + 3;
 
   /* ---------- 進度存檔 ---------- */
@@ -369,7 +637,8 @@
     return n + (state.final || 0);
   }
 
-  function solvedCount() { return Object.keys(state.solved).length; }
+  function solvedCount() { return Object.keys(state.solved).filter(function (k) { return ROCKS[k]; }).length; }
+  function rocksDone() { return ROCK_IDS.every(function (k) { return state.solved[k]; }); }
 
   // 每區的挑戰狀態：信譽值、工具補給、已蒐集的證據、潮位
   function newRun(sc, retry) {
@@ -604,6 +873,44 @@
           '<rect x="610" y="40" width="3" height="110" fill="#9ca3af"/><path d="M613 42 h20 v12 h-20 z" fill="#ef4444"/>' +
           ground(w, '#bdb6a8') +
           sign(205, '校名石') + sign(372, '走廊') + sign(468, '操場步道');
+      case 'river':
+        var shel = scene.hazard.shelters.map(function (sh) {
+          return '<g><rect x="' + sh[0] + '" y="' + (GROUND - 28) + '" width="' + (sh[1] - sh[0]) + '" height="8" fill="#6b7280"/>' +
+            '<path d="M' + sh[0] + ' ' + GROUND + ' l8 -7 h6 l8 -7 h6 l8 -7" stroke="#6b7280" stroke-width="3" fill="none"/>' +
+            '<text x="' + ((sh[0] + sh[1]) / 2) + '" y="' + (GROUND - 32) + '" text-anchor="middle" font-size="6.5" font-weight="800" fill="#15803d">' + sh[2] + '</text></g>';
+        }).join('');
+        return '' +
+          '<rect width="' + w + '" height="180" fill="#cfe8f7"/>' +
+          // 上游 V 形谷
+          '<path d="M0 30 L40 20 L96 128 L104 128 L170 26 L230 40 V150 H0 Z" fill="#7d8a6a"/>' +
+          '<path d="M96 128 Q100 134 104 128 L104 150 L96 150 Z" fill="#4b9bcc"/>' +
+          // 中游：山谷出口與沖積扇
+          '<path d="M230 40 L280 60 L300 70 L330 58 L380 50 L430 70 V150 H230 Z" fill="#a3b18a"/>' +
+          '<path d="M300 70 L250 150 L380 150 Z" fill="#d4b07a"/><path d="M300 70 Q290 110 270 150 M300 70 Q304 110 310 150 M300 70 Q330 110 350 150" stroke="#4b9bcc" stroke-width="2" fill="none"/>' +
+          // 下游：平原與海
+          '<rect x="430" y="80" width="' + (w - 430) + '" height="70" fill="#a9d18e"/>' +
+          '<rect x="640" y="70" width="' + (w - 640) + '" height="80" fill="#4b9bcc"/>' +
+          '<path d="M640 108 L700 92 Q720 108 700 124 Z" fill="#e8d3a0"/>' +
+          // 溪流（步道下方）
+          '<rect y="' + (GROUND + 8) + '" width="' + w + '" height="22" fill="#4b9bcc"/>' +
+          '<path class="wave" d="M0 ' + (GROUND + 12) + ' q10 -3 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0" stroke="#e0f2fe" stroke-width="1.5" fill="none"/>' +
+          '<rect y="' + GROUND + '" width="' + w + '" height="8" fill="#b8a98e"/>' +
+          shel + sign(40, '上游') + sign(280, '中游') + sign(540, '下游') + sign(735, '出海口');
+      case 'cape':
+        return '' +
+          '<rect width="' + w + '" height="180" fill="#cfe8f7"/>' +
+          '<rect y="96" width="' + w + '" height="54" fill="#4b9bcc"/>' +
+          '<path class="wave" d="M0 100 q10 -4 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0" stroke="#e0f2fe" stroke-width="2" fill="none"/>' +
+          // 海灣與沙灘
+          '<path d="M0 60 L30 56 L40 120 Q110 134 190 120 L200 56 L240 60 V150 H0 Z" fill="#a9d18e"/>' +
+          '<path d="M40 120 Q110 134 190 120 L196 150 L34 150 Z" fill="#e8d6a8"/>' +
+          // 岬角與海蝕柱
+          '<path d="M240 60 L470 54 L480 150 L240 150 Z" fill="#a98a66"/><path d="M240 56 L470 50 L470 58 L240 64 Z" fill="#7da35a"/>' +
+          '<path d="M300 92 L322 92 L326 130 L296 130 Z" fill="#b08f6a"/>' +
+          // 海蝕平臺
+          '<rect x="480" y="' + (GROUND - 4) + '" width="' + (w - 480) + '" height="8" fill="#8f7a5f"/>' +
+          ground(w, '#c9b48d') +
+          sign(130, '海灣') + sign(360, '岬角') + sign(530, '海蝕平臺');
     }
     return '';
   }
@@ -761,7 +1068,7 @@
 
     /* ===== 地圖 ===== */
     function renderMap() {
-      var allDone = solvedCount() === TOTAL_ROCKS;
+      var allDone = rocksDone();
       var svg = '' +
         '<rect width="320" height="180" fill="#bfe3f5"/>' +
         '<path d="M206 14 Q232 10 240 30 Q246 60 238 92 Q232 124 214 150 Q200 170 188 172 Q176 160 168 132 Q158 100 166 66 Q174 34 206 14 Z" fill="#a7d08c" stroke="#6b9b54" stroke-width="2"/>' +
@@ -790,7 +1097,7 @@
       fin.style.left = (200 / 320 * 100) + '%';
       fin.style.top = (118 / 180 * 100) + '%';
       fin.innerHTML = '<span class="pin-dot"></span><span class="pin-label"><strong>最終案件</strong><small></small></span>';
-      fin.querySelector('small').textContent = allDone ? (state.final ? stars(state.final) : '時空旅程') : '🔒 破解全部 ' + TOTAL_ROCKS + ' 塊標本後開啟';
+      fin.querySelector('small').textContent = allDone ? (state.final ? stars(state.final) : '時空旅程') : '🔒 破解全部 ' + ROCK_IDS.length + ' 塊岩石標本後開啟';
       fin.disabled = !allDone;
       fin.addEventListener('click', openFinal);
       pins.appendChild(fin);
@@ -844,8 +1151,12 @@
         var hiddenNow = r.hidden && !state.revealed[r.id];
         var solved = state.solved[r.id];
         parts += '<g class="specimen' + (solved ? ' solved' : '') + (hiddenNow ? ' is-hidden' : '') + '" data-rock="' + r.id + '" data-x="' + r.x + '">' +
-          '<ellipse cx="' + r.x + '" cy="' + (GROUND + 1) + '" rx="16" ry="3" fill="#00000033"/>' +
-          rock(R.tex, r.x, GROUND - 9, 30, 19, R.seed) +
+          (R.kind === 'land'
+            ? '<rect x="' + (r.x - 1) + '" y="' + (GROUND - 26) + '" width="2.5" height="26" fill="#7a5c3a"/>' +
+              '<circle cx="' + r.x + '" cy="' + (GROUND - 32) + '" r="9" fill="#fef3c7" stroke="#7a5c3a" stroke-width="1.5"/>' +
+              '<text x="' + r.x + '" y="' + (GROUND - 28.5) + '" text-anchor="middle" font-size="10">' + R.icon + '</text>'
+            : '<ellipse cx="' + r.x + '" cy="' + (GROUND + 1) + '" rx="16" ry="3" fill="#00000033"/>' +
+              rock(R.tex, r.x, GROUND - 9, 30, 19, R.seed)) +
           (solved
             ? '<g class="flag"><path d="M' + (r.x + 10) + ' ' + (GROUND - 18) + ' V' + (GROUND - 38) + '" stroke="#555" stroke-width="1.2"/><path d="M' + (r.x + 10) + ' ' + (GROUND - 38) + ' h14 l-3 4 l3 4 h-14 z" fill="' + FAMILIES[R.family].color + '"/></g>'
             : '<g class="glint">' + sparkle(r.x + 8, GROUND - 16, 3, i * 0.7) + '</g>') +
@@ -890,6 +1201,11 @@
       }
       if (H.type === 'tide') {
         return '<rect class="hz-tide" x="' + (H.flood - 10) + '" y="' + GROUND + '" width="' + (scene.width - H.flood + 10) + '" height="0" fill="#3b8fc4" opacity=".8"/>';
+      }
+      if (H.type === 'flood') {
+        return H.shelters.map(function (sh) {
+          return '<rect class="hz-shelter" x="' + sh[0] + '" y="' + (GROUND - 30) + '" width="' + (sh[1] - sh[0]) + '" height="3" fill="#22c55e"/>';
+        }).join('') + '<rect class="hz-surge" x="0" y="' + (GROUND - 22) + '" width="' + scene.width + '" height="52" fill="#8a6a3f"/>';
       }
       if (H.type === 'rockfall') {
         return H.shelters.map(function (sh) {
@@ -1104,7 +1420,11 @@
           els.stage.classList.add('hz-warn');
           Sound.play('alarm');
           buzz(300);
-          toast(H.type === 'gas' ? '⚠️ 火山即將噴氣！快離開紅色警示區！' : '⚠️ 落石警報！快躲進隧道或防落石棚！');
+          toast({
+            gas: '⚠️ 火山即將噴氣！快離開紅色警示區！',
+            rockfall: '⚠️ 落石警報！快躲進隧道或防落石棚！',
+            flood: '⚠️ 溪水暴漲警報！快跑到高處的避難平臺！'
+          }[H.type]);
         }
       } else if (hz.phase === 'warn' && hz.t <= 0) {
         els.stage.classList.remove('hz-warn');
@@ -1156,6 +1476,12 @@
         Sound.play('boom');
         if (inShelter()) { Sound.play('safe'); toast('😮‍💨 好險！你躲進了安全的地方。'); }
         else hit('被落石擊中了！');
+      } else if (H.type === 'flood') {
+        var surge = $('.hz-surge', els.svg);
+        if (surge) { surge.classList.remove('surge'); void surge.getBBox(); surge.classList.add('surge'); }
+        Sound.play('wave');
+        if (inShelter()) { Sound.play('safe'); toast('😮‍💨 好險！你在高處避開了洪水。溪水變混濁、水位上升時，要立刻離開河床！'); }
+        else hit('被暴漲的溪水沖倒了！');
       }
     }
 
@@ -1421,7 +1747,12 @@
 
       var box = els.inv;
       var num = Object.keys(ROCKS).indexOf(id) + 1;
-      $('.inv-title', box).textContent = prev ? '📒 已破案：' + R.name : '證物 #' + num + '：神祕的石頭';
+      var land = R.kind === 'land';
+      $('.inv-title', box).textContent = prev ? '📒 已破案：' + R.name : (land ? '現場 #' + num + '：可疑的地形' : '證物 #' + num + '：神祕的石頭');
+      $('.inv-safety', box).hidden = land;
+      var labels = box.querySelectorAll('.deduce-label');
+      labels[0].textContent = land ? '主要是哪一種作用造成的？' : '它屬於哪個家族？';
+      labels[1].textContent = land ? '這是什麼地形？' : '它叫什麼名字？';
       $('.inv-sub', box).textContent = '發現地點：' + sc.name + '（' + sc.place + '）';
 
       drawSpecimen();
@@ -1433,7 +1764,7 @@
 
       if (prev) {
         // 已破案：直接顯示所有證據與結論，方便複習
-        inv.used = TOOLS.map(function (t) { return t.id; });
+        inv.used = toolsFor(R).map(function (t) { return t.id; });
         renderTools();
         renderEvidence();
         $('.inv-deduce', box).hidden = true;
@@ -1444,8 +1775,55 @@
       openLayer(box);
     }
 
+    function drawLand(tool) {
+      var R = inv.R;
+      var svg = $('.inv-specimen svg', els.inv);
+      var out = R.view(false);
+      if (tool === 'scope') {
+        out += '<g class="anim-lens"><path d="M0 0H320V150H0Z M104 75 m-62 0 a62 62 0 1 0 124 0 a62 62 0 1 0 -124 0 M216 75 m-62 0 a62 62 0 1 0 124 0 a62 62 0 1 0 -124 0" fill="#111" fill-rule="evenodd" opacity=".82"/>' +
+          '<circle cx="104" cy="75" r="62" fill="none" stroke="#374151" stroke-width="4"/><circle cx="216" cy="75" r="62" fill="none" stroke="#374151" stroke-width="4"/></g>';
+      } else if (tool === 'float') {
+        var f = R.floatPath, dur = R.flow === 'fast' ? 1.1 : R.flow === 'slow' ? 4 : 0;
+        out += '<g class="buoy' + (dur ? ' moving' : '') + '" style="--dx:' + (f[2] - f[0]) + 'px;--dy:' + (f[3] - f[1]) + 'px;--dur:' + (dur || 1) + 's">' +
+          '<circle cx="' + f[0] + '" cy="' + f[1] + '" r="6" fill="#ef4444" stroke="#fff" stroke-width="2"/><path d="M' + f[0] + ' ' + (f[1] - 6) + ' v-8" stroke="#1f2933" stroke-width="1.5"/></g>' +
+          '<g><rect x="8" y="8" width="118" height="22" rx="11" fill="#ffffffe6" stroke="#1f2933"/><text x="67" y="23" text-anchor="middle" font-size="11" font-weight="800" fill="#1f2933">' +
+          (R.flow === 'fast' ? '🌊 水流很快！' : R.flow === 'slow' ? '💧 水流緩慢' : '🚫 水碰不到這裡') + '</text></g>';
+      } else if (tool === 'sieve') {
+        out += '<g class="anim-lens"><rect x="196" y="14" width="116" height="122" rx="10" fill="#fff7ed" stroke="#7a5c3a" stroke-width="3"/>' + grains(R.grain) + '</g>';
+      } else if (tool === 'photo') {
+        out = '<rect width="320" height="150" fill="#f3efe6"/>' +
+          '<defs><clipPath id="ph-a"><rect x="14" y="20" width="136" height="64"/></clipPath><clipPath id="ph-b"><rect x="170" y="20" width="136" height="64"/></clipPath></defs>' +
+          '<g class="anim-lens"><rect x="8" y="14" width="148" height="104" fill="#fff" stroke="#d6d3d1"/><g clip-path="url(#ph-a)"><g class="sepia" style="transform-box:view-box;transform-origin:0 0" transform="translate(14 20) scale(0.425)">' + R.view(true) + '</g></g>' +
+          '<text x="82" y="106" text-anchor="middle" font-size="12" font-weight="800" fill="#57534e">以前</text></g>' +
+          '<text x="160" y="72" text-anchor="middle" font-size="18" fill="#1f2933">→</text>' +
+          '<g class="anim-lens" style="animation-delay:.3s"><rect x="164" y="14" width="148" height="104" fill="#fff" stroke="#d6d3d1"/><g clip-path="url(#ph-b)"><g style="transform-box:view-box;transform-origin:0 0" transform="translate(170 20) scale(0.425)">' + R.view(false) + '</g></g>' +
+          '<text x="238" y="106" text-anchor="middle" font-size="12" font-weight="800" fill="#1f2933">現在</text></g>';
+      }
+      svg.innerHTML = out;
+    }
+
+    function grains(type) {
+      var g = '', i, x, y;
+      var put = function (shape) { g += shape; };
+      for (i = 0; i < 40; i++) {
+        x = 206 + (i * 37) % 96; y = 26 + (i * 23) % 98;
+        if (type === 'boulder' && i < 7) put('<path d="M' + (206 + (i * 31) % 80) + ' ' + (30 + (i * 17) % 80) + ' l16 -6 l12 10 l-4 14 l-18 2 z" fill="#8a7a6a" stroke="#4b3f33"/>');
+        if (type === 'gradient') put('<circle cx="' + x + '" cy="' + y + '" r="' + (y < 60 ? 5 : y < 95 ? 2.5 : 1) + '" fill="#a8916f"/>');
+        if (type === 'mud') put('<circle cx="' + x + '" cy="' + y + '" r=".9" fill="#8a6a58"/>');
+        if (type === 'sand') put('<circle cx="' + x + '" cy="' + y + '" r="1.5" fill="#d4b07a"/>' + (i % 9 === 0 ? '<path d="M' + x + ' ' + y + ' l-4 -4 q4 -4 8 0 z" fill="#fef3c7" stroke="#a8916f"/>' : ''));
+        if (type === 'blocks' && i < 6) put('<rect x="' + (208 + (i * 29) % 80) + '" y="' + (32 + (i * 19) % 76) + '" width="22" height="16" fill="#a98a66" stroke="#6b5a45" transform="rotate(' + (i * 17 % 30) + ' ' + (218 + (i * 29) % 80) + ' ' + (40 + (i * 19) % 76) + ')"/>');
+        if (type === 'gravel') put('<ellipse cx="' + x + '" cy="' + y + '" rx="3.5" ry="2.6" fill="#9ca3af" stroke="#6b7280"/>');
+        if (type === 'salt') put('<circle cx="' + x + '" cy="' + y + '" r="1.4" fill="#d4b07a"/>' + (i % 3 === 0 ? '<rect x="' + x + '" y="' + (y - 3) + '" width="4" height="4" fill="#fff" stroke="#94a3b8" transform="rotate(45 ' + (x + 2) + ' ' + (y - 1) + ')"/>' : ''));
+        if (type === 'flakes' && i < 10) put('<path d="M' + x + ' ' + y + ' q10 -6 20 0" stroke="#8a7458" stroke-width="3" fill="none"/>');
+      }
+      if (type === 'roots') put('<path d="M220 40 q10 30 0 60 M250 36 q-8 34 6 70 M282 44 q6 26 -4 56" stroke="#7a5233" stroke-width="3" fill="none"/><text x="254" y="128" text-anchor="middle" font-size="10" fill="#7a5233">沒有沙子堆積</text>');
+      if (type === 'gradient') put('<text x="254" y="22" text-anchor="middle" font-size="8" fill="#5f6b7a">扇頂：粗　→　扇緣：細</text>');
+      return g;
+    }
+
     function drawSpecimen(tool) {
       var R = inv.R;
+      if (R.kind === 'land') { drawLand(tool); return; }
       Art.setId(500);
       var svg = $('.inv-specimen svg', els.inv);
       var cx = 120, cy = 78, w = 170, h = 104;
@@ -1497,7 +1875,7 @@
     function renderTools() {
       var wrap = $('.inv-tools', els.inv);
       wrap.innerHTML = '';
-      TOOLS.forEach(function (t) {
+      toolsFor(inv.R).forEach(function (t) {
         var b = el('button', 'tool-btn');
         b.type = 'button';
         var used = inv.used.indexOf(t.id) >= 0;
@@ -1516,7 +1894,7 @@
         '這塊用了 ' + n + ' 種工具' + (n <= EFFICIENT_TOOLS ? '（' + EFFICIENT_TOOLS + ' 種以內破案可得效率星 ⭐）' : '（超過 ' + EFFICIENT_TOOLS + ' 種，拿不到效率星了）');
       var sup = $('.inv-supply', els.inv);
       sup.hidden = inv.done;
-      sup.textContent = '本區補給剩下：🧰 工具 ' + inv.run.tools + ' 次・🧪 鹽酸 ' + inv.run.acid + ' 滴・信譽 ' + '❤️'.repeat(inv.run.hearts) + '🤍'.repeat(HEARTS - inv.run.hearts);
+      sup.textContent = '本區補給剩下：🧰 工具 ' + inv.run.tools + ' 次' + (inv.R.kind === 'land' ? '' : '・🧪 鹽酸 ' + inv.run.acid + ' 滴') + '・信譽 ' + '❤️'.repeat(inv.run.hearts) + '🤍'.repeat(HEARTS - inv.run.hearts);
       sup.classList.toggle('low', inv.run.tools <= 2);
     }
 
@@ -1525,7 +1903,10 @@
       if (id === 'lens') Sound.play('lens');
       else if (id === 'light') Sound.play('light');
       else if (id === 'acid') Sound.play(R.fizz === 'strong' ? 'fizz' : R.fizz === 'weak' ? 'fizzWeak' : 'drip');
-      else if (id === 'water') Sound.play('plop');
+      else if (id === 'water' || id === 'float') Sound.play('plop');
+      else if (id === 'scope') Sound.play('lens');
+      else if (id === 'sieve') Sound.play('click');
+      else if (id === 'photo') Sound.play('light');
     }
 
     function useTool(id) {
@@ -1554,7 +1935,7 @@
         return;
       }
       inv.used.forEach(function (tid) {
-        var t = TOOLS.filter(function (x) { return x.id === tid; })[0];
+        var t = toolById(tid);
         var li = el('li', 'ev-card' + (fresh === tid ? ' fresh' : ''));
         li.appendChild(el('span', 'ev-tool', t.icon + ' ' + t.name));
         li.appendChild(el('span', 'ev-text', inv.R.ev[tid]));
@@ -1588,7 +1969,7 @@
       var nm = $('.deduce-name', box);
       fam.innerHTML = '';
       nm.innerHTML = '';
-      FAMILY_ORDER.forEach(function (f) {
+      (inv.R.kind === 'land' ? LAND_FAMILY_ORDER : FAMILY_ORDER).forEach(function (f) {
         var b = el('button', 'choice-chip', FAMILIES[f].name);
         b.type = 'button';
         b.style.setProperty('--c', FAMILIES[f].color);
@@ -1606,7 +1987,7 @@
       });
       var keyLabel = $('.deduce-key', box);
       if (inv.key) {
-        var t = TOOLS.filter(function (x) { return x.id === inv.key; })[0];
+        var t = toolById(inv.key);
         keyLabel.textContent = t.icon + ' ' + t.name + '：' + inv.R.ev[inv.key];
         keyLabel.classList.remove('missing');
       } else {
@@ -1622,11 +2003,11 @@
       var fb = $('.inv-feedback', els.inv);
       var msg = null;
       if (inv.family !== R.family) {
-        msg = '❌ 家族不對。重新看看證據的線索：' + FAMILIES[R.family].hint;
+        msg = (R.kind === 'land' ? '❌ 作用判斷錯了。' : '❌ 家族不對。') + '重新看看證據的線索：' + FAMILIES[R.family].hint;
       } else if (inv.name !== R.name) {
         msg = '❌ 家族對了，但名稱不對。' + R.nameHint;
       } else if (R.key.indexOf(inv.key) < 0) {
-        msg = '🤔 結論正確！但「' + TOOLS.filter(function (x) { return x.id === inv.key; })[0].name + '」的證據，其他選項的岩石也可能有，不能證明就是它。換一個更有說服力的證據！';
+        msg = '🤔 結論正確！但「' + toolById(inv.key).name + '」的證據，其他選項也可能有，不能證明就是它。換一個更有說服力的證據！';
       }
       if (msg) {
         inv.wrong++;
@@ -1699,7 +2080,7 @@
       if (finishedNow) {
         toast('🎉 這一區的標本全部破案！阿岩博士有話要說。');
       }
-      if (solvedCount() === TOTAL_ROCKS && !state.final) {
+      if (rocksDone() && !state.final && inv.R.kind !== 'land') {
         setTimeout(function () { toast('🗺️ 全部標本破案！回地圖挑戰最終案件。'); }, 2800);
       }
     }
@@ -1761,7 +2142,7 @@
       var grid = $('.book-grid', els.book);
       grid.innerHTML = '';
       Art.setId(900);
-      FAMILY_ORDER.forEach(function (f) {
+      FAMILY_ORDER.concat(LAND_FAMILY_ORDER).forEach(function (f) {
         var ids = Object.keys(ROCKS).filter(function (k) { return ROCKS[k].family === f; });
         var col = el('section', 'book-family');
         col.style.setProperty('--c', FAMILIES[f].color);
@@ -1773,7 +2154,7 @@
           var card = el('button', 'book-card' + (s ? '' : ' unknown'));
           card.type = 'button';
           card.disabled = !s;
-          card.innerHTML = '<svg viewBox="0 0 60 36" aria-hidden="true">' + (s ? rock(R.tex, 30, 18, 52, 30, R.seed) : '<text x="30" y="24" text-anchor="middle" font-size="18" fill="#9ca3af">？</text>') + '</svg><span class="book-name"></span><span class="book-stars"></span>';
+          card.innerHTML = '<svg viewBox="0 0 60 36" aria-hidden="true">' + (s ? (R.kind === 'land' ? '<text x="30" y="26" text-anchor="middle" font-size="22">' + R.icon + '</text>' : rock(R.tex, 30, 18, 52, 30, R.seed)) : '<text x="30" y="24" text-anchor="middle" font-size="18" fill="#9ca3af">？</text>') + '</svg><span class="book-name"></span><span class="book-stars"></span>';
           card.querySelector('.book-name').textContent = s ? R.name : '尚未破案';
           card.querySelector('.book-stars').textContent = s ? stars(s.stars) : '';
           card.addEventListener('click', function () {
@@ -1853,14 +2234,17 @@
 
     function openCert() {
       var total = totalStars();
-      var title = total >= MAX_STARS - 5 ? '岩石神探' : total >= MAX_STARS * 0.65 ? '資深岩石偵探' : '見習岩石偵探';
+      // 稱號以岩石主線的滿分為準，地形案件的星星算額外加分
+      var rockMax = ROCK_IDS.length * 3 + 4 + 3;
+      var title = total >= rockMax - 5 ? '岩石神探' : total >= rockMax * 0.65 ? '資深岩石偵探' : '見習岩石偵探';
       $('.cert-title', els.cert).textContent = title;
       $('.cert-stars', els.cert).textContent = '⭐ ' + total + ' / ' + MAX_STARS;
-      var counts = FAMILY_ORDER.map(function (f) {
-        var ids = Object.keys(ROCKS).filter(function (k) { return ROCKS[k].family === f; });
-        return FAMILIES[f].name + ' ' + ids.length + ' 塊';
-      });
-      $('.cert-detail', els.cert).textContent = '你用證據破解了 ' + TOTAL_ROCKS + ' 塊標本（' + counts.join('、') + '），還排出了岩石循環的時空旅程。';
+      var rockSolved = ROCK_IDS.filter(function (k) { return state.solved[k]; }).length;
+      var landSolved = Object.keys(ROCKS).filter(function (k) { return ROCKS[k].kind === 'land' && state.solved[k]; }).length;
+      var landTotal = TOTAL_ROCKS - ROCK_IDS.length;
+      $('.cert-detail', els.cert).textContent = '你用證據破解了 ' + rockSolved + ' 塊岩石標本' +
+        (landSolved ? '、' + landSolved + ' 個地形現場' : '') + '，還排出了岩石循環的時空旅程。' +
+        (landSolved < landTotal ? '還有 ' + (landTotal - landSolved) + ' 個地形現場等你去調查！' : '');
       openLayer(els.cert);
     }
 
