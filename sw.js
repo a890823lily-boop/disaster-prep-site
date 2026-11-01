@@ -1,20 +1,24 @@
 /* 防災資訊網 Service Worker：預先快取所有檔案，讓 APP 離線也能開啟 */
-var CACHE_NAME = 'disaster-prep-v9';
+var CACHE_NAME = 'disaster-prep-v10';
 var PRECACHE = [
   './',
   'index.html',
   'rocks.html',
   'rock-game.html',
+  'landforms.html',
   'landforms-lab.html',
   'css/style.css',
   'css/rocks.css',
   'css/rock-game.css',
+  'css/landforms.css',
   'css/landforms-lab.css',
   'js/main.js',
   'js/quiz.js',
   'js/rock-art.js',
+  'js/lesson-kit.js',
   'js/rocks.js',
   'js/rock-game.js',
+  'js/landforms.js',
   'js/landforms-lab.js',
   'js/campus-rocks.js',
   'manifest.webmanifest',

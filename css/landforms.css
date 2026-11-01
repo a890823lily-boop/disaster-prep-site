@@ -1,0 +1,225 @@
+/* ===== 大地如何變動（影片頁） ===== */
+.lf-hero {
+  padding: 32px 0 8px;
+  background: linear-gradient(180deg, #e6f2ec 0%, var(--bg) 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .lf-hero {
+    background: linear-gradient(180deg, #16241d 0%, var(--bg) 100%);
+  }
+}
+
+.lf-hero h1 {
+  font-size: clamp(1.7rem, 5.5vw, 2.4rem);
+}
+
+/* 課次選擇 */
+.lesson-picker {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  max-width: 880px;
+  margin: 0 auto 14px;
+}
+
+@media (max-width: 560px) {
+  .lesson-picker {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.lesson-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 60px;
+  padding: 8px;
+  border: 2px solid var(--border);
+  border-top: 5px solid var(--c);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.lesson-id {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.lesson-name {
+  font-weight: 900;
+}
+
+.lesson-btn[aria-selected="true"] {
+  border-color: var(--c);
+  background: var(--c);
+  color: #fff;
+}
+
+.lesson-btn[aria-selected="true"] .lesson-id {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ===== 場景動畫 ===== */
+.lf-page .player-stage .sway {
+  animation: lf-sway 1.2s ease-in-out infinite alternate;
+}
+
+.lf-page .player-stage .daynight .day {
+  animation: lf-day 4s steps(1) infinite;
+}
+
+.lf-page .player-stage .daynight .night {
+  animation: lf-night 4s steps(1) infinite;
+}
+
+.lf-page .player-stage .on .peel,
+.lf-page .player-stage [data-s].on .peel {
+  animation: lf-peel 2.4s ease-in-out infinite;
+}
+
+.lf-page .player-stage .on .wedge {
+  transform-origin: 50% 0;
+  animation: lf-wedge 2s ease-in-out infinite alternate;
+}
+
+.lf-page .player-stage .push-l {
+  animation: lf-push-l 1s ease-in-out infinite alternate;
+}
+
+.lf-page .player-stage .push-r {
+  animation: lf-push-r 1s ease-in-out infinite alternate;
+}
+
+.lf-page .player-stage .bubbles circle {
+  animation: lf-bubble 1.4s ease-out infinite;
+}
+
+.lf-page .player-stage .bubbles circle:nth-child(2) { animation-delay: 0.4s; }
+.lf-page .player-stage .bubbles circle:nth-child(3) { animation-delay: 0.8s; }
+
+.lf-page .player-stage .on .rust {
+  animation: lf-rust 4s ease-in forwards;
+}
+
+.lf-page .player-stage .rust {
+  opacity: 0;
+}
+
+.lf-page .player-stage .on .root {
+  stroke-dasharray: 90;
+  stroke-dashoffset: 90;
+  animation: lf-draw 2.5s ease-out forwards;
+}
+
+.lf-page .player-stage .flow {
+  animation: lf-flow 0.8s linear infinite;
+}
+
+.lf-page .player-stage .on .draw,
+.lf-page .player-stage [data-s].on .draw {
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+  animation: lf-draw 2s ease-out forwards;
+}
+
+.lf-page .player-stage .on .grow {
+  animation: lf-grow 2.4s ease-out both;
+}
+
+.lf-page .player-stage .rise-up {
+  animation: lf-rise 1.2s ease-in-out infinite alternate;
+}
+
+.lf-page .player-stage .splash {
+  animation: lf-splash 1.4s ease-out infinite;
+}
+
+.lf-page .player-stage .wave-move {
+  animation: lf-wave 2.4s ease-in-out infinite alternate;
+}
+
+.lf-page .player-stage .twinkle-all circle {
+  animation: twinkle 1.8s ease-in-out infinite;
+}
+
+@keyframes lf-sway {
+  from { transform: translateX(-4px); }
+  to { transform: translateX(4px); }
+}
+
+@keyframes lf-day {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes lf-night {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+@keyframes lf-peel {
+  0%, 30% { transform: translate(0, 0) rotate(0); opacity: 1; }
+  80% { transform: translate(30px, 24px) rotate(18deg); opacity: 0.2; }
+  100% { transform: translate(30px, 24px) rotate(18deg); opacity: 0; }
+}
+
+@keyframes lf-wedge {
+  from { transform: scaleX(0.4); }
+  to { transform: scaleX(1.3); }
+}
+
+@keyframes lf-push-l {
+  from { transform: translateX(0); }
+  to { transform: translateX(-8px); }
+}
+
+@keyframes lf-push-r {
+  from { transform: translateX(0); }
+  to { transform: translateX(8px); }
+}
+
+@keyframes lf-bubble {
+  0% { transform: translateY(0); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(-20px); opacity: 0; }
+}
+
+@keyframes lf-rust {
+  to { opacity: 0.85; }
+}
+
+@keyframes lf-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes lf-flow {
+  from { stroke-dashoffset: 24; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes lf-grow {
+  from { transform: scale(0.2); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes lf-rise {
+  from { transform: translateY(6px); }
+  to { transform: translateY(-6px); }
+}
+
+@keyframes lf-splash {
+  0% { transform: translate(0, 0); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translate(-10px, -16px); opacity: 0; }
+}
+
+@keyframes lf-wave {
+  from { transform: translateX(0); }
+  to { transform: translateX(-12px); }
+}
