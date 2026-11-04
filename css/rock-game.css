@@ -1601,3 +1601,96 @@
 .inv-specimen .sepia {
   filter: sepia(0.85);
 }
+
+/* ===== 各地點進度 ===== */
+.scene-progress {
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+}
+
+.scene-progress summary {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.scene-list {
+  list-style: none;
+  margin: 6px 0 4px;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.scene-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--card);
+  border-left: 4px solid #c0392b;
+}
+
+.scene-row.done {
+  border-left-color: #15803d;
+}
+
+.scene-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.scene-info small {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.scene-go,
+.scene-reset {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.scene-go {
+  border: 2px solid #1e3a8a;
+  background: transparent;
+  color: #1e3a8a;
+}
+
+.scene-reset {
+  border: 2px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.scene-reset.confirm {
+  border-color: #b91c1c;
+  background: #b91c1c;
+  color: #fff;
+}
+
+.scene-reset:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (prefers-color-scheme: dark) {
+  .scene-go {
+    border-color: #93c5fd;
+    color: #93c5fd;
+  }
+}
