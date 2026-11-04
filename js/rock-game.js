@@ -1025,7 +1025,29 @@
     }
 
     /* ===== 覆蓋層 ===== */
+    // 關閉遊戲視窗回到網頁：離開全螢幕、收起所有覆蓋層，畫面顯示「遊戲已暫停」
+    function closeToPage() {
+      var fs = document.fullscreenElement || document.webkitFullscreenElement;
+      if (fs) {
+        try {
+          var r = (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+          if (r && r.catch) r.catch(function () {});
+        } catch (e) { /* 忽略 */ }
+      }
+      els.dialog.hidden = true;
+      closeLayers();
+      scene = null;
+      run = null;
+      clearHazard();
+      els.svg.innerHTML = '';
+      els.toast.hidden = true;
+      updateHud();
+      $('.game-paused', game).hidden = false;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function openLayer(layer) {
+      $('.game-paused', game).hidden = true;
       [els.map, els.book, els.inv, els.think, els.final, els.cert, els.start, els.fail].forEach(function (l) {
         if (l !== layer) l.hidden = true;
       });
@@ -1185,6 +1207,7 @@
 
     /* ===== 進入場景 ===== */
     function enterScene(sc) {
+      $('.game-paused', game).hidden = true;
       els.toast.hidden = true;
       scene = sc;
       det.x = 40;
@@ -1791,6 +1814,7 @@
         if (e.key === 'Escape' && els.fail.hidden) {
           if (!els.inv.hidden && inv) closeInvestigation();
           else if (scene) closeLayers();
+          else if (!els.map.hidden || !els.start.hidden) closeToPage();
         }
         return;
       }
@@ -2320,6 +2344,12 @@
     $('#hud-map', game).addEventListener('click', openMap);
     $('#hud-book', game).addEventListener('click', openBook);
     $('#map-book', game).addEventListener('click', openBook);
+    $('#map-close', game).addEventListener('click', closeToPage);
+    $('#start-close', game).addEventListener('click', closeToPage);
+    $('#paused-resume', game).addEventListener('click', function () {
+      if (solvedCount() > 0 || Object.keys(state.introSeen).length) openMap();
+      else openLayer(els.start);
+    });
     Array.prototype.forEach.call(game.querySelectorAll('[data-close]'), function (b) {
       b.addEventListener('click', function () {
         if (!els.inv.hidden && inv) { closeInvestigation(); return; }

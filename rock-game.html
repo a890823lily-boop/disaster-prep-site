@@ -78,6 +78,11 @@
               <button type="button" class="btn btn-primary" id="dialog-next">繼續 ▶</button>
             </div>
             <div class="game-toast" role="status" hidden></div>
+            <div class="game-paused" hidden>
+              <p class="paused-title">⏸ 遊戲已暫停</p>
+              <p class="paused-note">進度都保留著，隨時可以回來繼續調查。</p>
+              <button type="button" class="btn btn-primary btn-lg" id="paused-resume">▶ 繼續遊戲</button>
+            </div>
           </div>
 
           <div class="game-controls">
@@ -90,6 +95,7 @@
           <!-- 開始畫面 -->
           <div class="game-layer game-start" hidden>
             <div class="layer-panel start-panel">
+              <button type="button" class="close-btn panel-close" id="start-close" aria-label="關閉遊戲視窗，回到網頁">✕</button>
               <p class="start-kicker">阿岩博士的委託</p>
               <h2>岩石偵探：消失的標本標籤</h2>
               <ul class="start-rules">
@@ -109,8 +115,11 @@
           <div class="game-layer game-map" hidden>
             <div class="layer-panel map-panel">
               <div class="layer-head">
-                <h3>🗺️ 選擇調查地點</h3>
-                <p id="map-progress"></p>
+                <div>
+                  <h3>🗺️ 選擇調查地點</h3>
+                  <p id="map-progress"></p>
+                </div>
+                <button type="button" class="close-btn" id="map-close" aria-label="關閉遊戲視窗，回到網頁">✕</button>
               </div>
               <div class="map-wrap">
                 <svg viewBox="0 0 320 180" aria-hidden="true"></svg>
@@ -126,6 +135,13 @@
                 <button type="button" class="btn btn-outline" id="map-sound">🔊 聲音：開</button>
                 <button type="button" class="link-btn" id="game-reset">全部重新開始</button>
               </div>
+              <nav class="map-links" aria-label="前往其他頁面">
+                <span>離開遊戲：</span>
+                <a href="index.html">🏠 首頁</a>
+                <a href="landforms.html">🏞️ 大地如何變動</a>
+                <a href="landforms-lab.html">🧪 地形實驗室</a>
+                <a href="rocks.html">🪨 認識岩石</a>
+              </nav>
             </div>
           </div>
 
