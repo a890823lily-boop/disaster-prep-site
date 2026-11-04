@@ -1768,3 +1768,33 @@
 .map-links a:hover {
   border-color: #c0392b;
 }
+
+/* ===== 地圖標籤：東側地點標籤放左邊；手機只顯示地名 ===== */
+.map-pin.flip {
+  flex-direction: row-reverse;
+  transform: translate(calc(-100% + 9px), -9px);
+  text-align: right;
+}
+
+@media (max-width: 560px) {
+  .pin-label {
+    padding: 1px 6px;
+  }
+  .pin-label strong {
+    font-size: 0.72rem;
+  }
+  .pin-label small {
+    display: none;
+  }
+  .pin-dot {
+    flex-basis: 14px;
+    height: 14px;
+    border-width: 2px;
+  }
+  .map-pin {
+    transform: translate(-7px, -7px);
+  }
+  .map-pin.flip {
+    transform: translate(calc(-100% + 7px), -7px);
+  }
+}
