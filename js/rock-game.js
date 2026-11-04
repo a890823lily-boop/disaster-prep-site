@@ -1103,13 +1103,15 @@
       pins.innerHTML = '';
       SCENES.forEach(function (sc) {
         var done = sc.rocks.filter(function (r) { return state.solved[r.id]; }).length;
-        var b = el('button', 'map-pin' + (sceneSolved(sc) ? ' done' : ''));
+        // 台灣本島東側的地點把標籤放在圖釘左邊，避免超出地圖右緣
+        var b = el('button', 'map-pin' + (sceneSolved(sc) ? ' done' : '') + (sc.pin[0] >= 140 ? ' flip' : ''));
         b.type = 'button';
         b.style.left = (sc.pin[0] / 320 * 100) + '%';
         b.style.top = (sc.pin[1] / 180 * 100) + '%';
         b.innerHTML = '<span class="pin-dot"></span><span class="pin-label"><strong></strong><small></small></span>';
         b.querySelector('strong').textContent = sc.name;
         b.querySelector('small').textContent = sc.place + '・' + done + '/' + sc.rocks.length + (state.thinkDone[sc.id] ? ' 💡' : '');
+        b.setAttribute('aria-label', sc.name + '，' + sc.place + '，破案 ' + done + '/' + sc.rocks.length);
         b.addEventListener('click', function () { enterScene(sc); });
         pins.appendChild(b);
       });
@@ -1119,7 +1121,7 @@
       fin.style.left = (200 / 320 * 100) + '%';
       fin.style.top = (118 / 180 * 100) + '%';
       fin.innerHTML = '<span class="pin-dot"></span><span class="pin-label"><strong>最終案件</strong><small></small></span>';
-      fin.querySelector('small').textContent = allDone ? (state.final ? stars(state.final) : '時空旅程') : '🔒 破解全部 ' + ROCK_IDS.length + ' 塊岩石標本後開啟';
+      fin.querySelector('small').textContent = allDone ? (state.final ? stars(state.final) : '時空旅程') : '🔒 破解 ' + ROCK_IDS.length + ' 塊岩石後開啟';
       fin.disabled = !allDone;
       fin.addEventListener('click', openFinal);
       pins.appendChild(fin);
