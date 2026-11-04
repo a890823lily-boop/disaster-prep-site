@@ -1103,6 +1103,74 @@
       pins.appendChild(fin);
 
       $('#map-progress', els.map).textContent = '已破解 ' + solvedCount() + ' / ' + TOTAL_ROCKS + ' 塊標本・⭐ ' + totalStars() + ' / ' + MAX_STARS;
+      renderSceneList();
+    }
+
+    /* ===== 各地點進度與單獨重新開始 ===== */
+    function sceneStars(sc) {
+      var n = 0;
+      sc.rocks.forEach(function (r) { if (state.solved[r.id]) n += state.solved[r.id].stars; });
+      if (state.think[sc.id]) n++;
+      return n;
+    }
+
+    function sceneStarted(sc) {
+      return sc.rocks.some(function (r) { return state.solved[r.id] || state.revealed[r.id]; }) ||
+        state.thinkDone[sc.id] || state.runs[sc.id] || state.introSeen[sc.id];
+    }
+
+    function resetScene(sc) {
+      sc.rocks.forEach(function (r) {
+        delete state.solved[r.id];
+        delete state.revealed[r.id];
+      });
+      delete state.think[sc.id];
+      delete state.thinkDone[sc.id];
+      delete state.runs[sc.id];
+      delete state.introSeen[sc.id];
+      save();
+      renderMap();
+      updateHud();
+      if (!solvedCount()) $('#game-start-btn', game).textContent = '▶ 開始調查';
+      toast('🔄 「' + sc.name + '」已重新開始，其他地點的進度都保留著。');
+    }
+
+    function renderSceneList() {
+      var list = $('.scene-list', els.map);
+      list.innerHTML = '';
+      SCENES.forEach(function (sc) {
+        var done = sc.rocks.filter(function (r) { return state.solved[r.id]; }).length;
+        var li = el('li', 'scene-row' + (sceneSolved(sc) ? ' done' : ''));
+        var info = el('div', 'scene-info');
+        info.appendChild(el('strong', null, sc.name));
+        info.appendChild(el('small', null, sc.place + '・破案 ' + done + '/' + sc.rocks.length + '・⭐ ' + sceneStars(sc) + '/' + (sc.rocks.length * 3 + 1) + (state.thinkDone[sc.id] ? '・💡' : '')));
+        li.appendChild(info);
+        var go = el('button', 'scene-go', '前往');
+        go.type = 'button';
+        go.addEventListener('click', function () { enterScene(sc); });
+        li.appendChild(go);
+        var btn = el('button', 'scene-reset', '↺ 重新開始');
+        btn.type = 'button';
+        btn.disabled = !sceneStarted(sc);
+        btn.setAttribute('aria-label', '重新開始「' + sc.name + '」');
+        btn.addEventListener('click', function () {
+          if (btn.dataset.confirm !== '1') {
+            btn.dataset.confirm = '1';
+            btn.textContent = '確定？再按一次';
+            btn.classList.add('confirm');
+            setTimeout(function () {
+              if (!btn.isConnected) return;
+              btn.dataset.confirm = '';
+              btn.textContent = '↺ 重新開始';
+              btn.classList.remove('confirm');
+            }, 4000);
+            return;
+          }
+          resetScene(sc);
+        });
+        li.appendChild(btn);
+        list.appendChild(li);
+      });
     }
 
     function openMap() {
@@ -2286,7 +2354,7 @@
       if (btn.dataset.confirm !== '1') {
         btn.dataset.confirm = '1';
         btn.textContent = '確定要清除所有進度？再按一次';
-        setTimeout(function () { btn.dataset.confirm = ''; btn.textContent = '重新開始'; }, 4000);
+        setTimeout(function () { btn.dataset.confirm = ''; btn.textContent = '全部重新開始'; }, 4000);
         return;
       }
       var practice = state.practice;
@@ -2294,7 +2362,7 @@
       state.practice = practice;
       save();
       btn.dataset.confirm = '';
-      btn.textContent = '重新開始';
+      btn.textContent = '全部重新開始';
       renderMap();
       updateHud();
       $('#game-start-btn', game).textContent = '▶ 開始調查';
